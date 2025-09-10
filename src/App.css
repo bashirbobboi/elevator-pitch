@@ -5,6 +5,36 @@
   text-align: center;
 }
 
+body {
+  background-color: wheat;
+}
+
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  justify-content:flex-start;
+  text-align: left;
+  align-items: flex-start;
+  padding: 2rem;
+  border: 1px solid grey;
+  border-radius: 10px;
+  background-color: rgb(251, 251, 255);
+}
+
+.dashboard-title {
+  color: black;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 cards in a row */
+  gap: 1rem; /* spacing between cards */
+  margin-top: 1rem;
+  width: 100%;
+}
+
+
+
 .logo {
   height: 6em;
   padding: 1.5em;
