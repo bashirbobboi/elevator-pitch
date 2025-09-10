@@ -11,6 +11,11 @@ const videoSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    shareId: { 
+        type: String,
+        required: true,
+        unique: true 
+    }, 
   },
   { timestamps: true } // adds createdAt & updatedAt automatically
 );

@@ -1,16 +1,16 @@
-// API endpoints for videos
 import express from "express";
-import { createVideo, getVideos, getVideoById } from "../controllers/videoController.js";
+import {
+  createVideo,
+  getVideos,
+  getVideoById,
+  getVideoByShareId,
+} from "../controllers/videoController.js";
 
 const router = express.Router();
 
-// POST /api/videos   → create video
-router.post("/", createVideo);
-
-// GET /api/videos    → get all videos
-router.get("/", getVideos);
-
-// GET /api/videos/:id → get video by ID
-router.get("/:id", getVideoById);
+router.post("/", createVideo);       // create video
+router.get("/", getVideos);          // get all videos
+router.get("/:id", getVideoById);    // get by Mongo _id
+router.get("/share/:shareId", getVideoByShareId); // 👈 get by shareId
 
 export default router;
