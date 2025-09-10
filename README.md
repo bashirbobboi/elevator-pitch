@@ -1,12 +1,70 @@
-# React + Vite
+# Elevator Pitch - Full Stack Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack application for creating and managing elevator pitch videos.
 
-Currently, two official plugins are available:
+## Project Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```
+elevator-pitch/
+├── frontend/          # React + Vite + Tailwind CSS
+├── backend/           # Node.js + Express + MongoDB
+├── package.json       # Root package.json for managing both apps
+└── README.md
+```
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+- Node.js (v18 or higher)
+- MongoDB (local or cloud)
+
+### Installation
+
+1. **Install all dependencies:**
+   ```bash
+   npm run install:all
+   ```
+
+2. **Set up environment variables:**
+   - Copy `backend/.env.example` to `backend/.env`
+   - Add your MongoDB connection string and other secrets
+
+### Development
+
+**Run both frontend and backend simultaneously:**
+```bash
+npm run dev
+```
+
+**Run individually:**
+```bash
+# Frontend only (React + Vite)
+npm run dev:frontend
+
+# Backend only (Node.js + Express)
+npm run dev:backend
+```
+
+### Production
+
+```bash
+# Build frontend
+npm run build
+
+# Start backend
+npm start
+```
+
+## Tech Stack
+
+### Frontend
+- React 19
+- Vite
+- Tailwind CSS
+- Modern JavaScript (ES6+)
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose ODM
