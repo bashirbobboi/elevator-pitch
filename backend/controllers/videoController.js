@@ -6,14 +6,12 @@ import { nanoid } from "nanoid";
 export const createVideo = async (req, res) => {
   try {
     const { title, videoUrl } = req.body;
-
     if (!title || !videoUrl) {
       return res.status(400).json({ error: "Title and videoUrl are required" });
     }
 
-    // Generate cleaner shareId: slug + random string
     const slug = slugify(title, { lower: true, strict: true });
-    const shareId = `${slug}-${nanoid(6)}`; // e.g. "my-first-pitch-a1b2c3"
+    const shareId = `${slug}-${nanoid(6)}`;
 
     const video = new Video({
       title,
@@ -28,7 +26,7 @@ export const createVideo = async (req, res) => {
   }
 };
 
-// Get all videos
+// Get all videos (admin use)
 export const getVideos = async (req, res) => {
   try {
     const videos = await Video.find();
@@ -38,7 +36,7 @@ export const getVideos = async (req, res) => {
   }
 };
 
-// Get video by Mongo _id (for admin use)
+// Get video by Mongo _id (admin use)
 export const getVideoById = async (req, res) => {
   try {
     const video = await Video.findById(req.params.id);
@@ -49,17 +47,35 @@ export const getVideoById = async (req, res) => {
   }
 };
 
-// Get video by shareId (for recruiters)
+// Get video by shareId (recruiter view + track analytics)
 export const getVideoByShareId = async (req, res) => {
   try {
+    const { viewerId } = req.body; // frontend sends UUID from localStorage
     const video = await Video.findOne({ shareId: req.params.shareId });
+
     if (!video) return res.status(404).json({ error: "Video not found" });
 
-    // Return only public fields for recruiters
+    // Increment total views
+    video.viewCount += 1;
+
+    // Track unique viewers
+    if (viewerId && !video.uniqueViewers.includes(viewerId)) {
+      video.uniqueViewers.push(viewerId);
+    }
+
+    // Update last viewed
+    video.lastViewed = new Date();
+
+    await video.save();
+
+    // Return recruiter-friendly response
     res.json({
       title: video.title,
       videoUrl: video.videoUrl,
       shareId: video.shareId,
+      viewCount: video.viewCount,
+      uniqueViewers: video.uniqueViewers.length,
+      lastViewed: video.lastViewed,
       createdAt: video.createdAt,
     });
   } catch (err) {
