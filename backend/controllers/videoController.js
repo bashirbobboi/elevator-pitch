@@ -1,6 +1,7 @@
 import Video from "../models/Video.js";
 import slugify from "slugify";
 import { nanoid } from "nanoid";
+import { deleteFile, fileExists } from "../utils/fileUtils.js";
 
 // Create new video (with external URL)
 export const createVideo = async (req, res) => {
@@ -147,6 +148,98 @@ export const getVideoByShareId = async (req, res) => {
       lastViewed: video.lastViewed,
       createdAt: video.createdAt,
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Delete video (admin use)
+export const deleteVideo = async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.id);
+    
+    if (!video) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    // Delete the video file if it's a local upload
+    if (video.videoUrl && video.videoUrl.startsWith('/uploads/')) {
+      const fileDeleted = deleteFile(video.videoUrl);
+      if (!fileDeleted) {
+        console.warn(`Warning: Could not delete file ${video.videoUrl}`);
+      }
+    }
+
+    // Delete from database
+    await Video.findByIdAndDelete(req.params.id);
+    
+    res.json({ 
+      message: "Video deleted successfully",
+      deletedVideo: {
+        id: video._id,
+        title: video.title,
+        shareId: video.shareId
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Update video (admin use)
+export const updateVideo = async (req, res) => {
+  try {
+    const { title } = req.body;
+    const video = await Video.findById(req.params.id);
+    
+    if (!video) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    // Update title if provided
+    if (title) {
+      video.title = title;
+      // Regenerate shareId if title changed
+      const slug = slugify(title, { lower: true, strict: true });
+      video.shareId = `${slug}-${nanoid(6)}`;
+    }
+
+    await video.save();
+    res.json(video);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Get video file info (admin use)
+export const getVideoFileInfo = async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.id);
+    
+    if (!video) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    const fileInfo = {
+      videoId: video._id,
+      title: video.title,
+      shareId: video.shareId,
+      videoUrl: video.videoUrl,
+      isLocalFile: video.videoUrl && video.videoUrl.startsWith('/uploads/'),
+      fileExists: false,
+      fileSize: 0
+    };
+
+    // If it's a local file, check if it exists and get size
+    if (fileInfo.isLocalFile) {
+      fileInfo.fileExists = fileExists(video.videoUrl);
+      if (fileInfo.fileExists) {
+        const { getFileSize } = await import("../utils/fileUtils.js");
+        fileInfo.fileSize = getFileSize(video.videoUrl);
+      }
+    }
+
+    res.json(fileInfo);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
