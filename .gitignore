@@ -2,6 +2,10 @@
 node_modules/
 */node_modules/
 
+# Uploaded files
+backend/uploads/
+uploads/
+
 # Production builds
 dist/
 build/

@@ -2,7 +2,7 @@ import Video from "../models/Video.js";
 import slugify from "slugify";
 import { nanoid } from "nanoid";
 
-// Create new video
+// Create new video (with external URL)
 export const createVideo = async (req, res) => {
   try {
     const { title, videoUrl } = req.body;
@@ -16,6 +16,35 @@ export const createVideo = async (req, res) => {
     const video = new Video({
       title,
       videoUrl,
+      shareId,
+    });
+
+    await video.save();
+    res.status(201).json(video);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Upload video file
+export const uploadVideo = async (req, res) => {
+  try {
+    const { title } = req.body;
+    
+    if (!title) {
+      return res.status(400).json({ error: "Title is required" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: "Video file is required" });
+    }
+
+    const slug = slugify(title, { lower: true, strict: true });
+    const shareId = `${slug}-${nanoid(6)}`;
+
+    const video = new Video({
+      title,
+      videoUrl: `/uploads/${req.file.filename}`, // Store relative path
       shareId,
     });
 
@@ -46,6 +75,46 @@ export const getVideoById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Get analytics for a single video (by Mongo _id)
+export const getVideoAnalytics = async (req, res) => {
+    try {
+      const video = await Video.findById(req.params.id);
+      if (!video) return res.status(404).json({ error: "Video not found" });
+  
+      res.json({
+        title: video.title,
+        shareId: video.shareId,
+        viewCount: video.viewCount,
+        uniqueViewers: video.uniqueViewers.length,
+        lastViewed: video.lastViewed,
+        createdAt: video.createdAt,
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+  
+  // Get analytics for ALL videos (admin overview)
+  export const getAllAnalytics = async (req, res) => {
+    try {
+      const videos = await Video.find();
+  
+      const analytics = videos.map(video => ({
+        title: video.title,
+        shareId: video.shareId,
+        viewCount: video.viewCount,
+        uniqueViewers: video.uniqueViewers.length,
+        lastViewed: video.lastViewed,
+        createdAt: video.createdAt,
+      }));
+  
+      res.json(analytics);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+  
 
 // Get video by shareId (recruiter view + track analytics)
 export const getVideoByShareId = async (req, res) => {
@@ -82,3 +151,5 @@ export const getVideoByShareId = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
