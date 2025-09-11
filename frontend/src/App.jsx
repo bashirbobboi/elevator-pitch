@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import Card from './components/card/card.component'
 import './components/card/card.styles.css'
+import logo from './assets/logo.png' // Adjust the filename to match your logo
 
 import { TbClipboardCopy } from 'react-icons/tb'
 
@@ -35,7 +36,9 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>Hello World</h1>
+      <header className="app-header">
+        <img src={logo} alt="Elevator Pitch Logo" className="app-logo" />
+      </header>
       <div className='dashboard-container'>
         <h2 className='text-black'>Dashboard</h2>
         <div className='cards-grid'>
@@ -65,7 +68,7 @@ function App() {
               <div className='video-info'>
                 <div className='video-details'>
                   <h3 className='video-title'>{video.title}</h3>
-                  <p className='video-stats'>Views: {video.viewCount} • Unique: {video.uniqueViewers.length}</p>
+                  <p className='video-stats'>Views: {video.viewCount} • Unique Viewers: {video.uniqueViewers.length}</p>
                 </div>
               </div>
               <div className='video-actions'>

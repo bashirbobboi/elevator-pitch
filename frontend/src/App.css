@@ -6,7 +6,7 @@
 }
 
 body {
-  background-color: white;
+  background-color: #f3eeee;
   margin: 0;
   padding: 0;
   font-family: 'Lexend', 'ubuntu', sans-serif, 'georgia', serif;
@@ -17,6 +17,28 @@ body {
   min-height: 100vh;
   padding: 2rem;
   box-sizing: border-box;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.app-logo {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
+}
+
+.app-header h1 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 2rem;
+  font-weight: 600;
 }
 
 .dashboard-container {
@@ -144,7 +166,7 @@ body {
 }
 
 .insights-btn:hover {
-  background-color: #eff6ff;
+  background-color: #e8e0d8;
   border: 1px solid rgb(135,84,78);
 }
 
@@ -155,8 +177,8 @@ body {
 }
 
 .view-btn:hover { 
-  background-color: #946d43;
-  border: 1px solid #946d43;
+  background-color: #ccbeb1;
+  border: 1px solid #bdac9c;
 }
 
 .more-btn {
