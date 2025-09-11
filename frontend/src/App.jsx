@@ -34,9 +34,8 @@ function App() {
   
 
   return (
-    <>
-    <div>
-      <h1 >Hello World</h1>
+    <div className="app-container">
+      <h1>Hello World</h1>
       <div className='dashboard-container'>
         <h2 className='text-black'>Dashboard</h2>
         <div className='cards-grid'>
@@ -60,27 +59,45 @@ function App() {
 
       <div className='videos-container'>
         <h2 className='text-black'>Videos</h2>
-        <div className='videos-block'>
+        <div className='videos-list'>
           {videos.map((video) => (
-            <Card key={video._id}>
-              <h3>{video.title}</h3>
-              <p>Views: {video.viewCount}</p>
-              <p>Viewers: {video.uniqueViewers.length}</p>
-              <p>Last Viewed: {video.lastViewed}</p>
-              <p>Created: {video.createdAt}</p>
-              <p>Link: {API_BASE}/videos/share/{video.shareId}</p>
-              <button onClick={() => {
-                navigator.clipboard.writeText(`${API_BASE}/videos/share/${video.shareId}`)
-                alert('Link copied to clipboard')
-              }}>
-                <TbClipboardCopy />
-              </button>
-            </Card>
+            <div key={video._id} className='video-entry'>
+              <div className='video-info'>
+                <div className='video-details'>
+                  <h3 className='video-title'>{video.title}</h3>
+                  <p className='video-stats'>Views: {video.viewCount} • Unique: {video.uniqueViewers.length}</p>
+                </div>
+              </div>
+              <div className='video-actions'>
+                <button 
+                  className='action-btn copy-btn'
+                  onClick={() => {
+                    navigator.clipboard.writeText(`http://localhost:5001/api/videos/share/${video.shareId}`)
+                    alert('Pitch copied to clipboard!')
+                  }}
+                >
+                  <TbClipboardCopy />
+                </button>
+                <button className='action-btn insights-btn'>
+                  View Insights
+                </button>
+                <button 
+                  className='action-btn view-btn'
+                  onClick={() => {
+                    window.open(`http://localhost:5001/api/videos/share/${video.shareId}`, '_blank')
+                  }}
+                >
+                  View Pitch
+                </button>
+                <button className='action-btn more-btn'>
+                  ⋯
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       </div>
     </div>
-    </>
   )
 }
 
