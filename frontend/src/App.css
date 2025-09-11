@@ -32,6 +32,22 @@ body {
   width: 100%;
 }
 
+.videos-container {
+  margin-top: 2rem;
+  padding: 2rem;
+  border: 1px solid grey;
+  border-radius: 10px;
+  background-color: rgb(251, 251, 255);
+}
+
+.videos-block {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
 
 
 .logo {
@@ -63,9 +79,50 @@ body {
 }
 
 .card {
-  padding: 2em;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+  margin: 0 0 1rem 0;
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.card p {
+  margin: 0.5rem 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 .read-the-docs {
   color: #888;
+}
+
+/* Responsive design for videos */
+@media (max-width: 768px) {
+  .videos-block {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1200px) {
+  .videos-block {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
 }
