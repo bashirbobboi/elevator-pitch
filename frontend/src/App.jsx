@@ -16,6 +16,7 @@ function App() {
   const [videos, setVideos] = useState([])
   const [analytics, setAnalytics] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [activePage, setActivePage] = useState('dashboard') // Track active page
 
   useEffect(() => {
     fetch('http://localhost:5001/api/videos')
@@ -41,22 +42,26 @@ function App() {
     {
       label: "Dashboard",
       href: "#dashboard",
-      icon: <LayoutDashboard className="text-white h-5 w-5 flex-shrink-0" />
+      page: "dashboard",
+      icon: <LayoutDashboard className="h-5 w-5 flex-shrink-0" />
     },
     {
       label: "Videos",
       href: "#videos", 
-      icon: <Video className="text-white h-5 w-5 flex-shrink-0" />
+      page: "videos",
+      icon: <Video className="h-5 w-5 flex-shrink-0" />
     },
     {
       label: "Analytics",
       href: "#analytics",
-      icon: <BarChart3 className="text-white h-5 w-5 flex-shrink-0" />
+      page: "analytics",
+      icon: <BarChart3 className="h-5 w-5 flex-shrink-0" />
     },
     {
       label: "Settings",
       href: "#settings",
-      icon: <Settings className="text-white h-5 w-5 flex-shrink-0" />
+      page: "settings",
+      icon: <Settings className="h-5 w-5 flex-shrink-0" />
     }
   ];
 
@@ -74,7 +79,12 @@ function App() {
             {/* Navigation Links */}
             <div className="mt-4 flex flex-col gap-2">
               {sidebarLinks.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
+                <SidebarLink 
+                  key={idx} 
+                  link={link} 
+                  isActive={activePage === link.page}
+                  onClick={() => setActivePage(link.page)}
+                />
               ))}
             </div>
           </div>
@@ -85,7 +95,7 @@ function App() {
               link={{
                 label: "Admin User",
                 href: "#profile",
-                icon: <User className="text-white h-5 w-5 flex-shrink-0" />
+                icon: <User className="h-5 w-5 flex-shrink-0" />
               }}
             />
           </div>

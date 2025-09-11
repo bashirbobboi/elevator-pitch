@@ -141,6 +141,7 @@ export const MobileSidebar = ({
 export const SidebarLink = ({
   link,
   className,
+  isActive = false,
   ...props
 }) => {
   const { open, animate, isInitialized } = useSidebar();
@@ -148,12 +149,18 @@ export const SidebarLink = ({
     <a
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2",
+        "flex items-center justify-start gap-2 group/sidebar py-2 rounded-lg transition-colors duration-200",
+        isActive ? "bg-[#f7f6f3]" : "hover:bg-white/10",
         className
       )}
       {...props}
     >
-      {link.icon}
+      <div className={cn(
+        "transition-colors duration-200",
+        isActive ? "text-[#453431]" : "text-white"
+      )}>
+        {link.icon}
+      </div>
       <motion.span
         initial={{ opacity: 0, width: "0px" }}
         animate={{
@@ -164,7 +171,10 @@ export const SidebarLink = ({
           duration: 0.2,
           ease: "easeInOut"
         }}
-        className="text-white text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre overflow-hidden !p-0 !m-0"
+        className={cn(
+          "text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre overflow-hidden !p-0 !m-0",
+          isActive ? "text-[#453431]" : "text-white"
+        )}
       >
         {link.label}
       </motion.span>
