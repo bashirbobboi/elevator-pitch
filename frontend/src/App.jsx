@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import Card from './components/card/card.component'
 import './components/card/card.styles.css'
-import logo from './assets/logo.png' // Adjust the filename to match your logo
+import logo from './assets/logo.png'
+import sidebar from './assets/elevatorpitch.png'
 import { Sidebar, SidebarBody, SidebarLink } from './components/ui/sidebar'
 import { LayoutDashboard, Video, BarChart3, Settings, User } from 'lucide-react'
 
@@ -66,12 +67,8 @@ function App() {
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {/* Logo */}
             <div className="flex items-center gap-2 py-4">
-              <img src={logo} alt="Elevator Pitch Logo" className="h-8 w-8 flex-shrink-0" />
-              {sidebarOpen && (
-                <span className="font-semibold text-lg text-neutral-800 dark:text-neutral-200">
-                  Elevator Pitch
-                </span>
-              )}
+              <img src={sidebar} alt="Elevator Pitch Logo" className="h-8 w-8 flex-shrink-0" />
+              {sidebarOpen }
             </div>
             
             {/* Navigation Links */}
@@ -96,7 +93,12 @@ function App() {
       </Sidebar>
 
       {/* Main Content */}
-      <div className="main-content">
+      <div 
+        className="main-content"
+        style={{
+          marginLeft: sidebarOpen ? '300px' : '60px'
+        }}
+      >
         <header className="app-header">
           <img src={logo} alt="Elevator Pitch Logo" className="app-logo" />
         </header>

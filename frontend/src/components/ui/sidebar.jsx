@@ -20,12 +20,19 @@ export const SidebarProvider = ({
   animate = true,
 }) => {
   const [openState, setOpenState] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
 
+  // Prevent flash on initial load
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsInitialized(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <SidebarContext.Provider value={{ open, setOpen, animate }}>
+    <SidebarContext.Provider value={{ open, setOpen, animate, isInitialized }}>
       {children}
     </SidebarContext.Provider>
   );
@@ -58,16 +65,18 @@ export const DesktopSidebar = ({
   children,
   ...props
 }) => {
-  const { open, setOpen, animate } = useSidebar();
+  const { open, setOpen, animate, isInitialized } = useSidebar();
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
+        "fixed left-0 top-0 h-screen px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 flex-shrink-0 z-10",
         className
       )}
+      initial={{ width: "60px" }}
       animate={{
-        width: animate ? (open ? "300px" : "60px") : "300px",
+        width: isInitialized && animate ? (open ? "300px" : "60px") : "60px",
       }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       {...props}
@@ -87,7 +96,7 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
+          "fixed top-0 left-0 h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full z-20"
         )}
         {...props}
       >
@@ -132,7 +141,7 @@ export const SidebarLink = ({
   className,
   ...props
 }) => {
-  const { open, animate } = useSidebar();
+  const { open, animate, isInitialized } = useSidebar();
   return (
     <a
       href={link.href}
@@ -144,11 +153,16 @@ export const SidebarLink = ({
     >
       {link.icon}
       <motion.span
+        initial={{ opacity: 0, width: "0px" }}
         animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
+          opacity: isInitialized && animate ? (open ? 1 : 0) : 0,
+          width: isInitialized && animate ? (open ? "auto" : "0px") : "0px",
         }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        transition={{
+          duration: 0.2,
+          ease: "easeInOut"
+        }}
+        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre overflow-hidden !p-0 !m-0"
       >
         {link.label}
       </motion.span>

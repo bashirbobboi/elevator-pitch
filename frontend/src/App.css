@@ -21,8 +21,22 @@ body {
 .main-content {
   flex: 1;
   padding: 2rem;
+  padding-left: 4rem; /* Add left padding to account for fixed sidebar */
+  padding-top: 3rem; /* Add top padding for mobile header */
   box-sizing: border-box;
   overflow-x: auto;
+  margin-left: 60px; /* Account for collapsed sidebar width */
+  transition: margin-left 0.2s ease-in-out; /* Smooth transition when sidebar expands */
+  min-height: 100vh; /* Ensure full height */
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0; /* No sidebar margin on mobile */
+    padding-left: 2rem; /* Reset left padding on mobile */
+    padding-top: 4rem; /* More top padding for mobile header */
+  }
 }
 
 .app-container {
