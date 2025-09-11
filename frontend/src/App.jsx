@@ -3,6 +3,8 @@ import './App.css'
 import Card from './components/card/card.component'
 import './components/card/card.styles.css'
 import logo from './assets/logo.png' // Adjust the filename to match your logo
+import { Sidebar, SidebarBody, SidebarLink } from './components/ui/sidebar'
+import { LayoutDashboard, Video, BarChart3, Settings, User } from 'lucide-react'
 
 import { TbClipboardCopy } from 'react-icons/tb'
 
@@ -12,6 +14,7 @@ function App() {
   const [count, setCount] = useState(0)
   const [videos, setVideos] = useState([])
   const [analytics, setAnalytics] = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     fetch('http://localhost:5001/api/videos')
@@ -32,13 +35,71 @@ function App() {
 
   const totalViews = videos.reduce((sum, video) => sum + (video.viewCount || 0), 0);
 
-  
+  // Sidebar navigation links
+  const sidebarLinks = [
+    {
+      label: "Dashboard",
+      href: "#dashboard",
+      icon: <LayoutDashboard className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+    },
+    {
+      label: "Videos",
+      href: "#videos", 
+      icon: <Video className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+    },
+    {
+      label: "Analytics",
+      href: "#analytics",
+      icon: <BarChart3 className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+    },
+    {
+      label: "Settings",
+      href: "#settings",
+      icon: <Settings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+    }
+  ];
 
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <img src={logo} alt="Elevator Pitch Logo" className="app-logo" />
-      </header>
+    <div className="app-layout">
+      <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
+        <SidebarBody className="justify-between gap-10">
+          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+            {/* Logo */}
+            <div className="flex items-center gap-2 py-4">
+              <img src={logo} alt="Elevator Pitch Logo" className="h-8 w-8 flex-shrink-0" />
+              {sidebarOpen && (
+                <span className="font-semibold text-lg text-neutral-800 dark:text-neutral-200">
+                  Elevator Pitch
+                </span>
+              )}
+            </div>
+            
+            {/* Navigation Links */}
+            <div className="mt-4 flex flex-col gap-2">
+              {sidebarLinks.map((link, idx) => (
+                <SidebarLink key={idx} link={link} />
+              ))}
+            </div>
+          </div>
+          
+          {/* User Profile */}
+          <div>
+            <SidebarLink
+              link={{
+                label: "Admin User",
+                href: "#profile",
+                icon: <User className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+              }}
+            />
+          </div>
+        </SidebarBody>
+      </Sidebar>
+
+      {/* Main Content */}
+      <div className="main-content">
+        <header className="app-header">
+          <img src={logo} alt="Elevator Pitch Logo" className="app-logo" />
+        </header>
       <div className='dashboard-container'>
         <h2 className='text-black'>Dashboard</h2>
         <div className='cards-grid'>
@@ -99,6 +160,7 @@ function App() {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   )
