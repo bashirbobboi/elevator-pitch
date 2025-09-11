@@ -63,7 +63,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  background-color: white;
+  background-color: #f3eeee;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -139,22 +139,24 @@ body {
 
 .insights-btn {
   background-color: white;
-  color: #2563eb;
-  border: 1px solid #2563eb;
+  color: rgb(135,84,78);
+  border: 1px solid rgb(135,84,78);
 }
 
 .insights-btn:hover {
   background-color: #eff6ff;
+  border: 1px solid rgb(135,84,78);
 }
 
 .view-btn {
-  background-color: #2563eb;
+  background-color: rgb(135,84,78);
   color: white;
-  border: 1px solid #2563eb;
+  border: 1px solid rgb(135,84,78);
 }
 
-.view-btn:hover {
-  background-color: #1d4ed8;
+.view-btn:hover { 
+  background-color: #946d43;
+  border: 1px solid #946d43;
 }
 
 .more-btn {
