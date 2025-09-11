@@ -6,7 +6,7 @@
 }
 
 body {
-  background-color: #f3eeee;
+  background-color: #453431;
   margin: 0;
   padding: 0;
   font-family: 'Lexend', 'ubuntu', sans-serif, 'georgia', serif;
@@ -28,6 +28,9 @@ body {
   margin-left: 60px; /* Account for collapsed sidebar width */
   transition: margin-left 0.2s ease-in-out; /* Smooth transition when sidebar expands */
   min-height: 100vh; /* Ensure full height */
+  border-top-left-radius: 40px; /* Rounded corner where it meets the sidebar */
+  background-color: #f3eeee; /* Match body background */
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
 /* Mobile adjustments */
@@ -36,6 +39,8 @@ body {
     margin-left: 0; /* No sidebar margin on mobile */
     padding-left: 2rem; /* Reset left padding on mobile */
     padding-top: 4rem; /* More top padding for mobile header */
+    border-top-left-radius: 0; /* Remove border radius on mobile */
+    box-shadow: none; /* Remove shadow on mobile */
   }
 }
 

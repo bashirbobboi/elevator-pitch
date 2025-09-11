@@ -41,22 +41,22 @@ function App() {
     {
       label: "Dashboard",
       href: "#dashboard",
-      icon: <LayoutDashboard className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      icon: <LayoutDashboard className="text-white h-5 w-5 flex-shrink-0" />
     },
     {
       label: "Videos",
       href: "#videos", 
-      icon: <Video className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      icon: <Video className="text-white h-5 w-5 flex-shrink-0" />
     },
     {
       label: "Analytics",
       href: "#analytics",
-      icon: <BarChart3 className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      icon: <BarChart3 className="text-white h-5 w-5 flex-shrink-0" />
     },
     {
       label: "Settings",
       href: "#settings",
-      icon: <Settings className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+      icon: <Settings className="text-white h-5 w-5 flex-shrink-0" />
     }
   ];
 
@@ -85,7 +85,7 @@ function App() {
               link={{
                 label: "Admin User",
                 href: "#profile",
-                icon: <User className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+                icon: <User className="text-white h-5 w-5 flex-shrink-0" />
               }}
             />
           </div>
@@ -103,7 +103,7 @@ function App() {
           <img src={logo} alt="Elevator Pitch Logo" className="app-logo" />
         </header>
       <div className='dashboard-container'>
-        <h2 className='text-black'>Dashboard</h2>
+        <h2 className='text-black' style={{ fontSize: '30px', fontWeight: '600' }}>Dashboard</h2>
         <div className='cards-grid'>
           <Card>
             <h3>Total Pitches</h3>
