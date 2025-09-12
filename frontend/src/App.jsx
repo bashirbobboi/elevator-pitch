@@ -23,6 +23,7 @@ function App() {
   const [profile, setProfile] = useState(null)
   const [profileLoading, setProfileLoading] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [viewingVideo, setViewingVideo] = useState(null)
   const toasterRef = useRef(null)
 
   useEffect(() => {
@@ -376,7 +377,447 @@ function App() {
         </header>
       
       {/* Conditional rendering based on active page */}
-      {activePage === 'profile' ? (
+      {activePage === 'view-pitch' ? (
+        <div className="view-pitch-container" style={{ 
+          height: '100vh', 
+          display: 'flex', 
+          flexDirection: 'column',
+          backgroundColor: '#f3eeee'
+        }}>
+          {/* Header Section */}
+          <div style={{
+            backgroundColor: '#453431',
+            padding: '2rem',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <button 
+                onClick={() => setActivePage('dashboard')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontSize: '16px'
+                }}
+              >
+                ← Back to Dashboard
+              </button>
+            </div>
+            <div style={{ textAlign: 'center', flex: 1 }}>
+              <h1 style={{ 
+                fontSize: '2.5rem', 
+                fontWeight: 'bold', 
+                margin: 0,
+                textTransform: 'uppercase',
+                letterSpacing: '2px'
+              }}>
+                {profile?.firstName?.toUpperCase()} {profile?.lastName?.toUpperCase()}
+              </h1>
+              <p style={{ 
+                fontSize: '1.2rem', 
+                margin: '0.5rem 0 0 0',
+                opacity: 0.9
+              }}>
+                {profile?.firstName} {profile?.lastName} - Software Developer
+              </p>
+            </div>
+            <div style={{ width: '200px' }}></div>
+          </div>
+          
+          {/* Profile Section */}
+          <div style={{
+            padding: '2rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2rem',
+            backgroundColor: 'white',
+            borderBottom: '1px solid #e5e7eb'
+          }}>
+            <div style={{
+              width: '120px',
+              height: '120px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              border: '4px solid #453431',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#f3f4f6'
+            }}>
+              {profile?.profilePicture ? (
+                <img 
+                  src={`http://localhost:5001${profile.profilePicture}`} 
+                  alt="Profile" 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover' 
+                  }} 
+                />
+              ) : (
+                <User className="h-12 w-12 text-gray-500" />
+              )}
+            </div>
+            
+            <div style={{ flex: 1 }}>
+              <h2 style={{ 
+                fontSize: '2rem', 
+                fontWeight: 'bold', 
+                margin: '0 0 0.5rem 0',
+                color: '#1f2937'
+              }}>
+                {profile?.firstName} {profile?.lastName}
+              </h2>
+              <p style={{ 
+                fontSize: '1.1rem', 
+                color: '#6b7280',
+                margin: 0
+              }}>
+                Software Developer
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button style={{
+                backgroundColor: '#453431',
+                color: 'white',
+                border: 'none',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'background-color 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#5a4a47'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#453431'}
+              >
+                📁 Portfolio
+              </button>
+              <button style={{
+                backgroundColor: '#453431',
+                color: 'white',
+                border: 'none',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'background-color 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#5a4a47'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#453431'}
+              >
+                💼 LinkedIn
+              </button>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div style={{ 
+            flex: 1, 
+            display: 'flex', 
+            gap: '2rem', 
+            padding: '2rem',
+            overflow: 'hidden'
+          }}>
+            {/* Video Section */}
+            <div style={{ 
+              flex: '0 0 400px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem'
+            }}>
+              <div style={{
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #e5e7eb'
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.5rem', 
+                  fontWeight: '600', 
+                  margin: '0 0 1rem 0',
+                  color: '#1f2937'
+                }}>
+                  Elevator Pitch
+                </h3>
+                {viewingVideo && (
+                  <video 
+                    controls 
+                    style={{ 
+                      width: '100%', 
+                      borderRadius: '8px',
+                      backgroundColor: '#000'
+                    }}
+                  >
+                    <source src={`http://localhost:5001${viewingVideo.videoUrl}`} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                )}
+              </div>
+              
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button style={{
+                  backgroundColor: '#453431',
+                  color: 'white',
+                  border: 'none',
+                  padding: '1rem 2rem',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  flex: 1,
+                  justifyContent: 'center',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#5a4a47'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#453431'}
+                >
+                  ▶️ Play Pitch
+                </button>
+                <button style={{
+                  backgroundColor: '#6b7280',
+                  color: 'white',
+                  border: 'none',
+                  padding: '1rem 2rem',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  flex: 1,
+                  justifyContent: 'center',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4b5563'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#6b7280'}
+                >
+                  📄 Download Resume
+                </button>
+              </div>
+            </div>
+
+            {/* Resume Preview Section */}
+            <div style={{ 
+              flex: 1,
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #e5e7eb',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <div style={{
+                padding: '1.5rem',
+                borderBottom: '1px solid #e5e7eb',
+                backgroundColor: '#f9fafb'
+              }}>
+                <h3 style={{ 
+                  fontSize: '1.5rem', 
+                  fontWeight: '600', 
+                  margin: 0,
+                  color: '#1f2937'
+                }}>
+                  Resume Preview
+                </h3>
+              </div>
+              
+              <div style={{ 
+                flex: 1, 
+                padding: '2rem',
+                overflow: 'auto',
+                backgroundColor: 'white'
+              }}>
+                {/* Resume Content */}
+                <div style={{ 
+                  maxWidth: '800px',
+                  margin: '0 auto',
+                  fontFamily: 'Georgia, serif',
+                  lineHeight: '1.6'
+                }}>
+                  <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <h1 style={{ 
+                      fontSize: '2.5rem', 
+                      fontWeight: 'bold', 
+                      margin: '0 0 1rem 0',
+                      color: '#1f2937'
+                    }}>
+                      {profile?.firstName} {profile?.lastName}
+                    </h1>
+                    <div style={{ 
+                      fontSize: '14px', 
+                      color: '#6b7280',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      flexWrap: 'wrap'
+                    }}>
+                      <span>📞 {profile?.phone || '+1 (555) 123-4567'}</span>
+                      <span>|</span>
+                      <span>✉️ {profile?.email || 'email@example.com'}</span>
+                      <span>|</span>
+                      <span>🌐 {profile?.portfolioUrl || 'portfolio.com'}</span>
+                      <span>|</span>
+                      <span>💼 {profile?.linkedInUrl || 'linkedin.com/in/profile'}</span>
+                    </div>
+                  </div>
+
+                  <hr style={{ border: '1px solid #e5e7eb', margin: '2rem 0' }} />
+
+                  <div style={{ marginBottom: '2rem' }}>
+                    <h2 style={{ 
+                      fontSize: '1.5rem', 
+                      fontWeight: 'bold', 
+                      margin: '0 0 1rem 0',
+                      color: '#1f2937',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px'
+                    }}>
+                      Education
+                    </h2>
+                    
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <h3 style={{ 
+                            fontSize: '1.2rem', 
+                            fontWeight: '600', 
+                            margin: '0 0 0.5rem 0',
+                            color: '#1f2937'
+                          }}>
+                            University of Sheffield
+                          </h3>
+                          <p style={{ 
+                            fontSize: '1rem', 
+                            margin: '0 0 0.5rem 0',
+                            color: '#374151'
+                          }}>
+                            Bachelor of Science in Computer Science
+                          </p>
+                          <p style={{ 
+                            fontSize: '0.9rem', 
+                            margin: 0,
+                            color: '#6b7280'
+                          }}>
+                            Upper Second Class Degree. Modules: Java Programming, Software Development for Mobile Devices, Internet of Things, Machine Learning and AI, Devices and Networks.
+                          </p>
+                        </div>
+                        <div style={{ textAlign: 'right', fontSize: '0.9rem', color: '#6b7280' }}>
+                          <p style={{ margin: '0 0 0.25rem 0' }}>Sheffield, England</p>
+                          <p style={{ margin: 0 }}>September 2022 - June 2025</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <h3 style={{ 
+                            fontSize: '1.2rem', 
+                            fontWeight: '600', 
+                            margin: '0 0 0.5rem 0',
+                            color: '#1f2937'
+                          }}>
+                            INTO Manchester
+                          </h3>
+                          <p style={{ 
+                            fontSize: '1rem', 
+                            margin: '0 0 0.5rem 0',
+                            color: '#374151'
+                          }}>
+                            NCUK International Foundation Year in Sciences and Engineering
+                          </p>
+                          <p style={{ 
+                            fontSize: '0.9rem', 
+                            margin: 0,
+                            color: '#6b7280'
+                          }}>
+                            Grades: Engineering Mathematics A*, English for Academic Purposes A*, Physics A, Further Mathematics A*.
+                          </p>
+                        </div>
+                        <div style={{ textAlign: 'right', fontSize: '0.9rem', color: '#6b7280' }}>
+                          <p style={{ margin: '0 0 0.25rem 0' }}>Manchester, England</p>
+                          <p style={{ margin: 0 }}>September 2021 - June 2022</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <hr style={{ border: '1px solid #e5e7eb', margin: '2rem 0' }} />
+
+                  <div style={{ marginBottom: '2rem' }}>
+                    <h2 style={{ 
+                      fontSize: '1.5rem', 
+                      fontWeight: 'bold', 
+                      margin: '0 0 1rem 0',
+                      color: '#1f2937',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px'
+                    }}>
+                      Experience
+                    </h2>
+                    
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <h3 style={{ 
+                            fontSize: '1.2rem', 
+                            fontWeight: '600', 
+                            margin: '0 0 0.5rem 0',
+                            color: '#1f2937'
+                          }}>
+                            180 Degrees Consulting
+                          </h3>
+                          <p style={{ 
+                            fontSize: '1rem', 
+                            margin: '0 0 0.5rem 0',
+                            color: '#374151'
+                          }}>
+                            Software Developer Intern
+                          </p>
+                          <p style={{ 
+                            fontSize: '0.9rem', 
+                            margin: 0,
+                            color: '#6b7280'
+                          }}>
+                            Developed web applications using React and Node.js. Collaborated with cross-functional teams to deliver high-quality software solutions. Implemented responsive designs and optimized application performance.
+                          </p>
+                        </div>
+                        <div style={{ textAlign: 'right', fontSize: '0.9rem', color: '#6b7280' }}>
+                          <p style={{ margin: '0 0 0.25rem 0' }}>Sheffield, England</p>
+                          <p style={{ margin: 0 }}>June 2023 - August 2023</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : activePage === 'profile' ? (
         <div className="profile-container" style={{ padding: '1rem', height: 'calc(100vh - 120px)', overflow: 'hidden' }}>
           <h2 className='text-black' style={{ fontSize: '24px', fontWeight: '600', marginBottom: '1rem' }}>Profile</h2>
           <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', justifyContent: 'flex-start', height: 'calc(100% - 60px)' }}>
@@ -523,26 +964,26 @@ function App() {
         </div>
       ) : (
         <>
-          <div className='dashboard-container'>
+      <div className='dashboard-container'>
             <h2 className='text-black' style={{ fontSize: '30px', fontWeight: '600' }}>Dashboard</h2>
-            <div className='cards-grid'>
-              <Card>
+        <div className='cards-grid'>
+          <Card>
                 <h3>Total Pitches</h3>
                 <p>{videos.length}</p>
-              </Card>
+          </Card>
 
-              <Card>
+          <Card>
                 <h3>Total Views</h3>
                 <p>{totalViews}</p>
-              </Card>
+          </Card>
 
-              <Card>
+          <Card>
                 <h3>Most Viewed Pitch</h3>
                 <p>{mostViewedVideo.title}</p>
 
-              </Card>
-            </div>
-          </div>
+          </Card>
+        </div>
+      </div>
 
           <div className='videos-container'>
             <h2 className='text-black'>Videos</h2>
@@ -577,7 +1018,8 @@ function App() {
                     <button 
                       className='action-btn view-btn'
                       onClick={() => {
-                        window.open(`http://localhost:5001/api/videos/share/${video.shareId}`, '_blank')
+                        setViewingVideo(video)
+                        setActivePage('view-pitch')
                       }}
                     >
                       View Pitch
