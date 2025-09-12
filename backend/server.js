@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import videoRoutes from "./routes/videoRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
 
 
 dotenv.config();
@@ -29,6 +30,9 @@ app.get("/api/test", (req, res) => {
 
 // Video routes
 app.use("/api/videos", videoRoutes);
+
+// Profile routes
+app.use("/api/profile", profileRoutes);
 
 
 const PORT = process.env.PORT || 5001;
