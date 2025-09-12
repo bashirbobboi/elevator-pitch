@@ -22,7 +22,7 @@ body {
   flex: 1;
   padding: 2rem;
   padding-left: 4rem; /* Add left padding to account for fixed sidebar */
-  padding-top: 3rem; /* Add top padding for mobile header */
+  padding-top: 1.5rem; /* Add top padding for mobile header */
   box-sizing: border-box;
   overflow-x: auto;
   margin-left: 60px; /* Account for collapsed sidebar width */
@@ -55,8 +55,8 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid #e5e7eb;
 }
 

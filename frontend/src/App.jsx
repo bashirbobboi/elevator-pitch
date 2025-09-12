@@ -5,7 +5,8 @@ import './components/card/card.styles.css'
 import logo from './assets/logo.png'
 import sidebar from './assets/elevatorpitch.png'
 import { Sidebar, SidebarBody, SidebarLink } from './components/ui/sidebar'
-import { LayoutDashboard, Video, BarChart3, Settings, User, UserCircle } from 'lucide-react'
+import { LayoutDashboard, Video, BarChart3, Settings, User, UserCircle, ChevronDown } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 import { TbClipboardCopy } from 'react-icons/tb'
 import { ProfileForm } from './components/ui/profile-form'
@@ -21,6 +22,7 @@ function App() {
   const [activePage, setActivePage] = useState('dashboard') // Track active page
   const [profile, setProfile] = useState(null)
   const [profileLoading, setProfileLoading] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
   const toasterRef = useRef(null)
 
   useEffect(() => {
@@ -32,6 +34,18 @@ function App() {
     // Load admin profile on app start
     fetchProfile()
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownOpen && !event.target.closest('[data-dropdown]')) {
+        setDropdownOpen(false)
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [dropdownOpen])
 
   useEffect((videoId) => {
     fetch(`http://localhost:5001/api/videos/${videoId}/stats`)
@@ -220,7 +234,16 @@ function App() {
             {/* Logo */}
             <div className="flex items-center gap-2 py-4">
               <img src={sidebar} alt="Elevator Pitch Logo" className="h-8 w-8 flex-shrink-0" />
-              {sidebarOpen }
+              <motion.span
+                animate={{ 
+                  opacity: sidebarOpen ? 1 : 0,
+                  width: sidebarOpen ? "auto" : 0
+                }}
+                transition={{ duration: 0.2 }}
+                className="text-white font-semibold text-lg whitespace-nowrap overflow-hidden"
+              >
+                Elevator Pitch
+              </motion.span>
             </div>
             
             {/* Navigation Links */}
@@ -258,9 +281,98 @@ function App() {
       >
         <header className="app-header">
           <img src={logo} alt="Elevator Pitch Logo" className="app-logo" />
-          <button className='action-btn insights-btn' style={{ marginLeft: 'auto', padding: '0.5rem 1rem' }}>
-            New Pitch
-          </button>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button className='action-btn insights-btn' style={{ padding: '0.5rem 1rem' }}>
+              New Pitch
+            </button>
+            <div data-dropdown style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ 
+                width: '48px', 
+                height: '48px', 
+                borderRadius: '50%', 
+                overflow: 'hidden',
+                border: '2px solid #e5e7eb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#f3f4f6'
+              }}>
+                {profile?.profilePicture ? (
+                  <img 
+                    src={`http://localhost:5001${profile.profilePicture}`} 
+                    alt="Profile" 
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover' 
+                    }} 
+                  />
+                ) : (
+                  <User className="h-4 w-4 text-gray-500" />
+                )}
+              </div>
+              <button 
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '0.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '4px',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#f3f4f6'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+              >
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              </button>
+              
+              {/* Dropdown Menu */}
+              {dropdownOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: '0',
+                  marginTop: '0.5rem',
+                  backgroundColor: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  zIndex: 1000,
+                  minWidth: '160px'
+                }}>
+                  <button
+                    onClick={() => {
+                      setActivePage('profile')
+                      setDropdownOpen(false)
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      border: 'none',
+                      background: 'none',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      color: '#374151',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f3f4f6'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                  >
+                    <UserCircle className="h-4 w-4" />
+                    Profile
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </header>
       
       {/* Conditional rendering based on active page */}
