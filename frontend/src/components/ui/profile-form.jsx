@@ -92,11 +92,12 @@ export function ProfileForm({ profile, onSaveProfile, onUpdateProfile, onUploadP
 
   return (
     <div 
-      className="rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black"
+      className="rounded-none md:rounded-2xl p-4 md:p-6 shadow-input bg-white dark:bg-black"
       style={{ 
         width: '100%', 
         maxWidth: '42rem', 
-        minWidth: '32rem' 
+        minWidth: '32rem',
+        height: 'fit-content'
       }}
     >
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
@@ -107,7 +108,7 @@ export function ProfileForm({ profile, onSaveProfile, onUpdateProfile, onUploadP
       </p>
 
       <form className="my-8" onSubmit={handleSubmit}>
-        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-3">
           <LabelInputContainer>
             <Label htmlFor="firstName">First name</Label>
             <Input 
@@ -130,7 +131,7 @@ export function ProfileForm({ profile, onSaveProfile, onUpdateProfile, onUploadP
           </LabelInputContainer>
         </div>
         
-        <LabelInputContainer className="mb-4">
+        <LabelInputContainer className="mb-3">
           <Label htmlFor="email">Email Address</Label>
           <Input 
             id="email" 
@@ -141,7 +142,7 @@ export function ProfileForm({ profile, onSaveProfile, onUpdateProfile, onUploadP
           />
         </LabelInputContainer>
         
-        <LabelInputContainer className="mb-4">
+        <LabelInputContainer className="mb-3">
           <Label htmlFor="location">Location</Label>
           <Input 
             id="location" 
@@ -152,7 +153,7 @@ export function ProfileForm({ profile, onSaveProfile, onUpdateProfile, onUploadP
           />
         </LabelInputContainer>
         
-        <LabelInputContainer className="mb-4">
+        <LabelInputContainer className="mb-3">
           <Label htmlFor="linkedInUrl">LinkedIn URL</Label>
           <Input 
             id="linkedInUrl" 
@@ -163,7 +164,7 @@ export function ProfileForm({ profile, onSaveProfile, onUpdateProfile, onUploadP
           />
         </LabelInputContainer>
         
-        <LabelInputContainer className="mb-8">
+        <LabelInputContainer className="mb-4">
           <Label htmlFor="portfolioUrl">Portfolio URL</Label>
           <Input 
             id="portfolioUrl" 
@@ -189,12 +190,33 @@ export function ProfileForm({ profile, onSaveProfile, onUpdateProfile, onUploadP
         )}
 
         <button
-          className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+          style={{
+            backgroundColor: 'white',
+            color: 'rgb(135,84,78)',
+            border: '1px solid rgb(135,84,78)',
+            borderRadius: '8px',
+            height: '40px',
+            width: '100%',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            opacity: isSubmitting ? 0.6 : 1,
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            if (!isSubmitting) {
+              e.target.style.backgroundColor = '#e8e0d8';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isSubmitting) {
+              e.target.style.backgroundColor = 'white';
+            }
+          }}
           type="submit"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Saving...' : (profile ? 'Update Profile' : 'Save Profile')} &rarr;
-          <BottomGradient />
+          {isSubmitting ? 'Saving...' : (profile ? 'Update Profile' : 'Save Profile')} →
         </button>
       </form>
     </div>

@@ -265,9 +265,9 @@ function App() {
       
       {/* Conditional rendering based on active page */}
       {activePage === 'profile' ? (
-        <div className="profile-container" style={{ padding: '2rem' }}>
-          <h2 className='text-black' style={{ fontSize: '30px', fontWeight: '600', marginBottom: '2rem' }}>Profile</h2>
-          <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+        <div className="profile-container" style={{ padding: '1rem', height: 'calc(100vh - 120px)', overflow: 'hidden' }}>
+          <h2 className='text-black' style={{ fontSize: '24px', fontWeight: '600', marginBottom: '1rem' }}>Profile</h2>
+          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', justifyContent: 'flex-start', height: 'calc(100% - 60px)' }}>
             <div style={{ flex: '0 0 auto', marginRight: '2rem' }}>
               {profileLoading ? (
                 <div style={{ 
@@ -293,11 +293,12 @@ function App() {
               width: '100%',
               maxWidth: '42rem',
               minWidth: '32rem',
-              padding: '2rem',
+              padding: '1.5rem',
               backgroundColor: 'white',
               borderRadius: '16px',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-              border: '1px solid #e5e7eb'
+              border: '1px solid #e5e7eb',
+              height: 'fit-content'
             }}>
               <h3 style={{ 
                 fontSize: '18px', 
@@ -315,8 +316,8 @@ function App() {
               }}>
                 {profileLoading ? (
                   <div style={{
-                    width: '120px',
-                    height: '120px',
+                    width: '200px',
+                    height: '200px',
                     borderRadius: '50%',
                     backgroundColor: '#f3f4f6',
                     display: 'flex',
@@ -327,8 +328,8 @@ function App() {
                   </div>
                 ) : (
                   <div style={{
-                    width: '120px',
-                    height: '120px',
+                    width: '200px',
+                    height: '200px',
                     borderRadius: '50%',
                     backgroundColor: '#f3f4f6',
                     border: '2px dashed #d1d5db',
@@ -371,16 +372,26 @@ function App() {
                   htmlFor="profile-picture-upload"
                   style={{
                     padding: '0.5rem 1rem',
-                    backgroundColor: profileLoading ? '#f9fafb' : '#f3f4f6',
-                    border: '1px solid #d1d5db',
+                    backgroundColor: profileLoading ? '#f9fafb' : 'white',
+                    border: '1px solid rgb(135,84,78)',
                     borderRadius: '8px',
-                    color: profileLoading ? '#9ca3af' : '#374151',
+                    color: profileLoading ? '#9ca3af' : 'rgb(135,84,78)',
                     fontSize: '14px',
                     fontWeight: '500',
                     cursor: profileLoading ? 'not-allowed' : 'pointer',
                     transition: 'all 0.2s ease',
                     display: 'inline-block',
                     opacity: profileLoading ? 0.6 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!profileLoading) {
+                      e.target.style.backgroundColor = '#e8e0d8';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!profileLoading) {
+                      e.target.style.backgroundColor = 'white';
+                    }
                   }}
                 >
                   {profileLoading ? 'Loading...' : (profile?.profilePicture ? 'Change Photo' : 'Upload Photo')}
