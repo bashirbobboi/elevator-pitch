@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import './App.css'
 import Card from './components/card/card.component'
 import './components/card/card.styles.css'
@@ -8,6 +9,7 @@ import { Sidebar, SidebarBody, SidebarLink } from './components/ui/sidebar'
 import { LayoutDashboard, Video, BarChart3, Settings, User, UserCircle, ChevronDown } from 'lucide-react'
 import FileInput from './components/ui/file-input'
 import { motion } from 'framer-motion'
+import RecruiterView from './components/RecruiterView'
 
 import { TbClipboardCopy } from 'react-icons/tb'
 import { ProfileForm } from './components/ui/profile-form'
@@ -16,6 +18,7 @@ import Toaster from './components/ui/toast'
 const API_BASE = 'http://localhost:5001/api'
 
 function App() {
+  const location = useLocation();
   const [count, setCount] = useState(0)
   const [videos, setVideos] = useState([])
   const [analytics, setAnalytics] = useState(null)
@@ -26,6 +29,9 @@ function App() {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [viewingVideo, setViewingVideo] = useState(null)
   const toasterRef = useRef(null)
+
+  // Check if we're on a recruiter route
+  const isRecruiterRoute = location.pathname.startsWith('/api/videos/share/')
 
   useEffect(() => {
     fetch('http://localhost:5001/api/videos')
@@ -228,9 +234,15 @@ function App() {
   ];
 
   return (
-    <div className="app-layout">
-      <Toaster ref={toasterRef} defaultPosition="top-right" />
-      <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
+    <Routes>
+      {/* Recruiter Route - No sidebar, clean layout */}
+      <Route path="/api/videos/share/:shareId" element={<RecruiterView />} />
+      
+      {/* Admin Routes - Full layout with sidebar */}
+      <Route path="/*" element={
+        <div className="app-layout">
+          <Toaster ref={toasterRef} defaultPosition="top-right" />
+          <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
         <SidebarBody className="justify-between gap-10">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {/* Logo */}
@@ -1037,6 +1049,8 @@ function App() {
       )}
       </div>
     </div>
+        } />
+    </Routes>
   )
 }
 
