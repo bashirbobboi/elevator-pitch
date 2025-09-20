@@ -100,16 +100,17 @@ const Idle = ({ accept, maxSizeInMB, onClick, onDrop, error }) => {
   return (
     <div
       className={cn(
-        `h-full w-full bg-black overflow-hidden relative border-[3px] border-dashed rounded-lg flex flex-col items-center justify-center select-none cursor-pointer transition-colors`,
+        `h-full w-full overflow-hidden relative border-[3px] border-dashed rounded-lg flex flex-col items-center justify-center select-none cursor-pointer transition-colors`,
         isDragOver ? 'border-blue-500 bg-blue-950/20' : 'border-zinc-800 hover:border-zinc-700'
       )}
+      style={{ backgroundColor: '#f4f4f2' }}
       onClick={onClick}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <CloudUpload size={40} className="text-blue-500" />
-      <p className="text-sm text-zinc-200 font-medium">Upload a file</p>
+      <CloudUpload size={40} className="text-black" />
+      <p className="text-sm text-black font-medium">Upload a file</p>
       <p className="text-xs mt-2 text-zinc-400">Click to upload or drag and drop</p>
       {accept && (
         <p className="text-xs text-zinc-400">
@@ -206,7 +207,7 @@ const Loading = () => {
   }, []);
 
   return (
-    <div className="h-full w-full bg-black relative border-[3px] border-zinc-900 rounded-xl flex flex-col items-center justify-center gap-4">
+    <div className="h-full w-full relative border-[3px] border-zinc-900 rounded-xl flex flex-col items-center justify-center gap-4" style={{ backgroundColor: '#f4f4f2' }}>
       <div ref={containerRef} className="w-full px-10 flex items-center justify-between relative">
         <motion.span
           animate={{
@@ -218,9 +219,9 @@ const Loading = () => {
             ease: 'easeInOut'
           }}
           ref={fromRef}
-          className="bg-black rounded-full border border-blue-400 p-2 z-10 h-10 w-10 flex items-center justify-center shadow-sm shadow-blue-500"
+          className=" rounded-full border border-black-400 p-2 z-10 h-10 w-10 flex items-center justify-center shadow-sm shadow-black-500" style={{ backgroundColor: '#f4f4f2' }}
         >
-          <File size={20} strokeWidth={1.5} className="text-zinc-300" />
+          <File size={20} strokeWidth={1.5} className="text-black" />
         </motion.span>
         <motion.span
           animate={{
@@ -233,9 +234,9 @@ const Loading = () => {
             ease: 'easeInOut'
           }}
           ref={toRef}
-          className="bg-black rounded-full border border-blue-400 p-2 z-10 h-10 w-10 flex items-center justify-center shadow-sm shadow-blue-500"
+          className=" rounded-full border border-black-400 p-2 z-10 h-10 w-10 flex items-center justify-center shadow-sm shadow-black-500" style={{ backgroundColor: '#f4f4f2' }}
         >
-          <Globe size={32} strokeWidth={1.5} className="text-zinc-300" />
+          <Globe size={32} strokeWidth={1.5} className="text-black" />
         </motion.span>
         <svg
           fill="none"
@@ -295,7 +296,7 @@ const Loading = () => {
           </defs>
         </svg>
       </div>
-      <p className="text-xs text-zinc-300 font-light">Uploading file...</p>
+      <p className="text-xs text-black-300 font-light">Uploading file...</p>
     </div>
   );
 };
@@ -317,7 +318,7 @@ const Success = ({ file, onRemove }) => {
   }, [file, fileType]);
 
   return (
-    <div className="h-full w-full bg-black relative border-[3px] border-zinc-900 rounded-xl flex flex-col items-center justify-center gap-4 overflow-hidden">
+    <div className="h-full w-full bg-white relative border-[3px] border-zinc-900 rounded-xl flex flex-col items-center justify-center gap-4 overflow-hidden">
       <div className="w-full flex-1 flex flex-col items-center justify-center gap-3 relative h-full overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full">
           {fileType === 'image' && imagePreview ? (
@@ -414,11 +415,11 @@ const FileInput = ({
 
     setState('loading');
     try {
-      // Add minimum loading time to show animation
-      const [result] = await Promise.all([
-        onFileChange?.(files),
-        new Promise(resolve => setTimeout(resolve, 3500)) // Minimum 1 second loading
-      ]);
+      // Wait for minimum loading time first, then call upload function
+      await new Promise(resolve => setTimeout(resolve, 3500)); // Show loading animation
+      
+      // Now perform the actual upload
+      await onFileChange?.(files);
     } catch (error) {
       console.error(error);
       setState('idle');
@@ -449,11 +450,11 @@ const FileInput = ({
 
     setState('loading');
     try {
-      // Add minimum loading time to show animation
-      const [result] = await Promise.all([
-        onFileChange?.(files),
-        new Promise(resolve => setTimeout(resolve, 3500)) // Minimum 1 second loading
-      ]);
+      // Wait for minimum loading time first, then call upload function
+      await new Promise(resolve => setTimeout(resolve, 3500)); // Show loading animation
+      
+      // Now perform the actual upload
+      await onFileChange?.(files);
     } catch (error) {
       console.error(error);
       setState('idle');
