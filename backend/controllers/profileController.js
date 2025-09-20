@@ -30,10 +30,17 @@ export const createProfile = async (req, res) => {
   }
 };
 
-// Get profile (since we're not implementing login yet, we'll get the first/only profile)
+// Get profile (since we're not implementing login yet, we'll get the most complete profile)
 export const getProfile = async (req, res) => {
   try {
-    const profile = await Profile.findOne().sort({ createdAt: -1 });
+    // First try to get a profile with resume, then fall back to most recent
+    let profile = await Profile.findOne({ resume: { $ne: null } }).sort({ updatedAt: -1 });
+    
+    if (!profile) {
+      // If no profile with resume, get the most recent one
+      profile = await Profile.findOne().sort({ createdAt: -1 });
+    }
+    
     if (!profile) {
       return res.status(404).json({ error: 'No profile found' });
     }

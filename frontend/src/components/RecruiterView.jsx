@@ -58,6 +58,18 @@ const RecruiterView = () => {
     return viewerId;
   };
 
+  const handleDownloadResume = () => {
+    if (profile?.resume) {
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement('a');
+      link.href = `http://localhost:5001${profile.resume}`;
+      link.download = `${profile.firstName}_${profile.lastName}_Resume.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -123,15 +135,16 @@ const RecruiterView = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 mb-6">
+            <div className="flex flex-col gap-4 mb-6 w-full max-w-[80%]">
               <button 
-                className="bg-green-400 hover:bg-green-500 text-black px-6 py-3 rounded-full font-semibold flex items-center gap-2 transition-colors"
+                className="bg-green-400 hover:bg-green-500 text-black px-6 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors w-full"
               >
                 <span>▶</span>
                 Play Elevator Pitch
               </button>
               <button 
-                className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2 transition-colors"
+                onClick={handleDownloadResume}
+                className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors w-full"
               >
                 <span>⬇</span>
                 Download Resume
@@ -167,11 +180,25 @@ const RecruiterView = () => {
         </div>
       </div>
 
-      {/* Rest of the page - blank for now */}
-      <div className="min-h-[60vh] w-full bg-white">
-        {/* This will be where the video content goes later */}
-        <div className="flex items-center justify-center h-full py-20">
-          <p className="text-gray-500">Video content will be displayed here</p>
+      {/* Resume Display Section */}
+      <div className="min-h-[60vh] w-full bg-white px-8 py-12">
+        <div className="max-w-4xl mx-auto">
+          {profile?.resume ? (
+            <div className="w-full h-[130vh] border border-gray-300 rounded-lg overflow-hidden shadow-lg">
+              <iframe
+                src={`http://localhost:5001${profile.resume}`}
+                className="w-full h-full border-0"
+                title="Resume PDF"
+              />
+            </div>
+          ) : (
+            <div className="w-full h-[70vh] border border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+              <div className="text-center">
+                <span className="text-6xl text-gray-400 mb-4 block">📄</span>
+                <p className="text-gray-500 text-lg">No resume available</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
