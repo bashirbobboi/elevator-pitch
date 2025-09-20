@@ -1017,7 +1017,7 @@ function App() {
                 <button 
                   className='action-btn copy-btn'
                   onClick={() => {
-                    navigator.clipboard.writeText(`http://localhost:5001/api/videos/share/${video.shareId}`)
+                    navigator.clipboard.writeText(`http://localhost:5173/api/videos/share/${video.shareId}`)
                     toasterRef.current?.show({
                       title: 'Copied!',
                       message: 'Pitch link copied to clipboard',
