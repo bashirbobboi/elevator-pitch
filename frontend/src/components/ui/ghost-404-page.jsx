@@ -167,7 +167,7 @@ export function NotFound() {
             className="text-lg md:text-xl text-[#222222] mb-8 md:mb-12 opacity-50 select-none"
             variants={itemVariants}
           >
-            Whoops! This page must be a ghost - it's not here!
+            Whoops! This elevator pitch must have been taken down!
           </motion.p>
 
           <motion.div 
@@ -180,25 +180,25 @@ export function NotFound() {
               }
             }}
           >
-            <button 
+            {/* <button 
               onClick={handleGoBack}
               className="inline-flex items-center gap-2 bg-[#222222] text-white px-8 py-3 rounded-full text-lg font-medium hover:bg-[#000000] transition-colors select-none"
             >
               <ArrowLeft size={20} />
               Go Back
-            </button>
+            </button> */}
           </motion.div>
 
           <motion.div 
             className="mt-12"
             variants={itemVariants}
           >
-            <a
+            {/* <a
               href="/"
               className="text-[#222222] opacity-50 hover:opacity-70 transition-opacity underline select-none"
             >
               Return to Home
-            </a>
+            </a> */}
           </motion.div>
         </motion.div>
       </AnimatePresence>
