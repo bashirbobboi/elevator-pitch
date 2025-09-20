@@ -47,6 +47,10 @@ const profileSchema = new mongoose.Schema({
     type: String, // Path to the uploaded image file
     default: null
   },
+  resume: {
+    type: String, // Path to the uploaded resume file
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

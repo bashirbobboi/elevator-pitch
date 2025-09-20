@@ -11,6 +11,7 @@ import FileInput from './components/ui/file-input'
 import { motion } from 'framer-motion'
 import RecruiterView from './components/RecruiterView'
 import { NotFound } from './components/ui/ghost-404-page'
+import ElevatorPitchForm from './components/ui/elevator-pitch-form'
 
 import { TbClipboardCopy } from 'react-icons/tb'
 import { ProfileForm } from './components/ui/profile-form'
@@ -29,6 +30,7 @@ function App() {
   const [profileLoading, setProfileLoading] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [viewingVideo, setViewingVideo] = useState(null)
+  const [showElevatorPitchForm, setShowElevatorPitchForm] = useState(false)
   const toasterRef = useRef(null)
 
   // Check if we're on a recruiter route
@@ -300,7 +302,11 @@ function App() {
         <header className="app-header">
           <img src={logo} alt="Elevator Pitch Logo" className="app-logo" />
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button className='action-btn insights-btn' style={{ padding: '0.5rem 1rem' }}>
+            <button 
+              className='action-btn insights-btn' 
+              style={{ padding: '0.5rem 1rem' }}
+              onClick={() => setShowElevatorPitchForm(true)}
+            >
               New Pitch
             </button>
             <div data-dropdown style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -1050,6 +1056,15 @@ function App() {
             </div>
           </div>
         </>
+      )}
+      
+      {/* Elevator Pitch Form Modal */}
+      {showElevatorPitchForm && (
+        <ElevatorPitchForm 
+          onClose={() => setShowElevatorPitchForm(false)}
+          profile={profile}
+          onUpdateProfile={updateProfile}
+        />
       )}
       </div>
     </div>

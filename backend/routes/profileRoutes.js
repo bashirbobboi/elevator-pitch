@@ -5,8 +5,10 @@ import {
   getProfile,
   updateProfile,
   deleteProfile,
-  uploadProfilePicture
+  uploadProfilePicture,
+  uploadResume
 } from '../controllers/profileController.js';
+import { resumeUpload } from '../config/multer.js';
 
 const router = express.Router();
 
@@ -55,5 +57,16 @@ router.post('/upload-picture', (req, res, next) => {
     next();
   });
 }, uploadProfilePicture);
+
+// Resume upload route
+router.post('/upload-resume', (req, res, next) => {
+  resumeUpload.single('resume')(req, res, (err) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ error: err.message });
+    }
+    next();
+  });
+}, uploadResume);
 
 export default router;

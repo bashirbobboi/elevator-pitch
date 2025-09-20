@@ -146,3 +146,46 @@ export const uploadProfilePicture = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Upload resume
+export const uploadResume = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No resume file uploaded' });
+    }
+
+    console.log('Resume file uploaded:', {
+      filename: req.file.filename,
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size
+    });
+
+    // Find existing profile or create new one
+    let profile = await Profile.findOne();
+    
+    if (!profile) {
+      return res.status(404).json({ error: 'Profile not found. Please create a profile first.' });
+    }
+
+    // Delete old resume file if it exists
+    if (profile.resume) {
+      const oldResumeFile = path.join(process.cwd(), 'uploads', 'resumes', path.basename(profile.resume));
+      if (await fileExists(oldResumeFile)) {
+        await deleteFile(oldResumeFile);
+      }
+    }
+
+    // Update profile with new resume path
+    profile.resume = `/uploads/resumes/${req.file.filename}`;
+    await profile.save();
+
+    res.json({
+      message: 'Resume uploaded successfully',
+      resume: profile.resume
+    });
+  } catch (error) {
+    console.error('Error uploading resume:', error);
+    res.status(500).json({ error: error.message });
+  }
+};

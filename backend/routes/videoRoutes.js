@@ -11,12 +11,12 @@ import {
   updateVideo,
   getVideoFileInfo,
 } from "../controllers/videoController.js";
-import upload from "../config/multer.js";
+import videoUpload from "../config/multer.js";
 
 const router = express.Router();
 
 router.post("/", createVideo);             // Create video (with external URL)
-router.post("/upload", upload.single("video"), uploadVideo); // Upload video file
+router.post("/upload", videoUpload.single("video"), uploadVideo); // Upload video file
 router.get("/", getVideos);                // Admin: list videos
 router.get("/:id", getVideoById);          // Admin: get by Mongo _id
 router.put("/:id", updateVideo);           // Admin: update video
