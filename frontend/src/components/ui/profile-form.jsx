@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-export function ProfileForm({ profile, onSaveProfile, onUpdateProfile, onUploadPicture }) {
+export function ProfileForm({ profile, onSaveProfile, onUpdateProfile }) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -55,33 +55,6 @@ export function ProfileForm({ profile, onSaveProfile, onUpdateProfile, onUploadP
     }
   };
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setMessage("Please select an image file");
-      return;
-    }
-
-    // Validate file size (30MB)
-    if (file.size > 30 * 1024 * 1024) {
-      setMessage("File size must be less than 30MB");
-      return;
-    }
-
-    try {
-      const result = await onUploadPicture(file);
-      if (result.success) {
-        setMessage("Profile picture uploaded successfully!");
-      } else {
-        setMessage(`Error: ${result.error}`);
-      }
-    } catch (error) {
-      setMessage("An error occurred while uploading the picture");
-    }
-  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({

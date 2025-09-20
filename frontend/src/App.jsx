@@ -6,6 +6,7 @@ import logo from './assets/logo.png'
 import sidebar from './assets/elevatorpitch.png'
 import { Sidebar, SidebarBody, SidebarLink } from './components/ui/sidebar'
 import { LayoutDashboard, Video, BarChart3, Settings, User, UserCircle, ChevronDown } from 'lucide-react'
+import FileInput from './components/ui/file-input'
 import { motion } from 'framer-motion'
 
 import { TbClipboardCopy } from 'react-icons/tb'
@@ -838,125 +839,125 @@ function App() {
                   profile={profile}
                   onSaveProfile={saveProfile}
                   onUpdateProfile={updateProfile}
-                  onUploadPicture={uploadProfilePicture}
                 />
               )}
             </div>
-            <div className="profile-picture-section" style={{ 
-              width: '100%',
-              maxWidth: '42rem',
-              minWidth: '32rem',
-              padding: '1.5rem',
-              backgroundColor: 'white',
-              borderRadius: '16px',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-              border: '1px solid #e5e7eb',
-              height: 'fit-content'
-            }}>
-              <h3 style={{ 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                marginBottom: '1rem',
-                color: '#1f2937'
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: '1' }}>
+              {/* Profile Picture Display Section */}
+              <div className="profile-picture-section" style={{ 
+                width: '100%',
+                maxWidth: '42rem',
+                minWidth: '32rem',
+                padding: '1.5rem',
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #e5e7eb',
+                height: 'fit-content'
               }}>
-                Profile Picture
-              </h3>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '1rem'
+                <h3 style={{ 
+                  fontSize: '18px', 
+                  fontWeight: '600', 
+                  marginBottom: '1rem',
+                  color: '#1f2937'
+                }}>
+                  Profile Picture
+                </h3>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '1rem'
+                }}>
+                  {profileLoading ? (
+                    <div style={{
+                      width: '200px',
+                      height: '200px',
+                      borderRadius: '50%',
+                      backgroundColor: '#f3f4f6',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <p style={{ fontSize: '12px', color: '#6b7280' }}>Loading...</p>
+                    </div>
+                  ) : (
+                    <div style={{
+                      width: '200px',
+                      height: '200px',
+                      borderRadius: '50%',
+                      backgroundColor: '#f3f4f6',
+                      border: '2px dashed #d1d5db',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      overflow: 'hidden'
+                    }}>
+                      {profile?.profilePicture ? (
+                        <img 
+                          src={`http://localhost:5001${profile.profilePicture}`}
+                          alt="Profile"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            borderRadius: '50%'
+                          }}
+                        />
+                      ) : (
+                        <UserCircle size={48} color="#9ca3af" />
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* File Upload Section */}
+              <div className="upload-section" style={{ 
+                width: '100%',
+                maxWidth: '42rem',
+                minWidth: '32rem',
+                padding: '1.5rem',
+                backgroundColor: 'white',
+                borderRadius: '16px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #e5e7eb',
+                height: 'fit-content'
               }}>
-                {profileLoading ? (
-                  <div style={{
-                    width: '200px',
-                    height: '200px',
-                    borderRadius: '50%',
-                    backgroundColor: '#f3f4f6',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <p style={{ fontSize: '12px', color: '#6b7280' }}>Loading...</p>
-                  </div>
-                ) : (
-                  <div style={{
-                    width: '200px',
-                    height: '200px',
-                    borderRadius: '50%',
-                    backgroundColor: '#f3f4f6',
-                    border: '2px dashed #d1d5db',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    overflow: 'hidden'
-                  }}>
-                    {profile?.profilePicture ? (
-                      <img 
-                        src={`http://localhost:5001${profile.profilePicture}`}
-                        alt="Profile"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          borderRadius: '50%'
-                        }}
-                      />
-                    ) : (
-                      <UserCircle size={48} color="#9ca3af" />
-                    )}
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={async (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      await uploadProfilePicture(file);
-                    }
-                  }}
-                  style={{ display: 'none' }}
-                  id="profile-picture-upload"
-                />
-                <label
-                  htmlFor="profile-picture-upload"
-                  style={{
-                    padding: '0.5rem 1rem',
-                    backgroundColor: profileLoading ? '#f9fafb' : 'white',
-                    border: '1px solid rgb(135,84,78)',
-                    borderRadius: '8px',
-                    color: profileLoading ? '#9ca3af' : 'rgb(135,84,78)',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    cursor: profileLoading ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.2s ease',
-                    display: 'inline-block',
-                    opacity: profileLoading ? 0.6 : 1
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!profileLoading) {
-                      e.target.style.backgroundColor = '#e8e0d8';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!profileLoading) {
-                      e.target.style.backgroundColor = 'white';
-                    }
-                  }}
-                >
-                  {profileLoading ? 'Loading...' : (profile?.profilePicture ? 'Change Photo' : 'Upload Photo')}
-                </label>
+                <h3 style={{ 
+                  fontSize: '18px', 
+                  fontWeight: '600', 
+                  marginBottom: '1rem',
+                  color: '#1f2937'
+                }}>
+                  Upload New Picture
+                </h3>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  <FileInput
+                    accept="image/png, image/jpeg, image/jpg, image/gif"
+                    maxSizeInMB={30}
+                    onFileChange={async (files) => {
+                      const file = files[0];
+                      if (file) {
+                        await uploadProfilePicture(file);
+                      }
+                    }}
+                    allowMultiple={false}
+                  />
+                </div>
                 <p style={{
                   fontSize: '12px',
                   color: '#6b7280',
                   textAlign: 'center',
-                  margin: 0
+                  margin: '1rem 0 0 0'
                 }}>
-                  JPG, PNG or GIF<br />
-                  Max size 30MB
+                  JPG, PNG or GIF • Max size 30MB
                 </p>
               </div>
             </div>

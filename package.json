@@ -19,9 +19,12 @@
     "backend"
   ],
   "dependencies": {
+    "framer-motion": "^12.23.16",
+    "lucide-react": "^0.544.0",
     "nanoid": "^5.1.5",
     "react-icons": "^5.5.0",
     "slugify": "^1.6.6",
+    "tailwindcss": "^4.1.13",
     "uuid": "^13.0.0"
   }
 }
