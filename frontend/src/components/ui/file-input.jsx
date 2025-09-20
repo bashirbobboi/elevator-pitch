@@ -355,21 +355,22 @@ const Success = ({ file, onRemove }) => {
           className="absolute inset-0"
         />
 
-        <div className="absolute inset-0 flex flex-col items-start justify-end p-3 bg-black/50">
-          <div className="flex items-end justify-between w-full">
-            <div className="flex flex-col items-start justify-end flex-1">
-              <p className="text-sm text-white font-medium line-clamp-1">{file[0].name}</p>
-              <p className="text-xs text-white line-clamp-1">{formatFileSize(file[0].size)}</p>
+        <div className="absolute inset-0 flex flex-col items-start justify-end p-3 bg-black/50 z-10">
+          <div className="flex items-end justify-between w-full gap-2">
+            <div className="flex flex-col items-start justify-end flex-1 min-w-0">
+              <p className="text-sm text-white font-medium truncate w-full">{file[0].name}</p>
+              <p className="text-xs text-white truncate w-full">{formatFileSize(file[0].size)}</p>
               {file.length > 1 && (
-                <p className="text-xs text-white line-clamp-1">{file.length} files</p>
+                <p className="text-xs text-white truncate w-full">{file.length} files</p>
               )}
             </div>
             <button
               type="button"
               onClick={onRemove}
-              className="p-2 rounded-full hover:bg-white/5 group"
+              className="p-2 rounded-full hover:bg-white/5 group bg-black/20 border border-white/10 flex-shrink-0"
+              style={{ minWidth: '32px', minHeight: '32px' }}
             >
-              <Trash size={16} className="group-hover:text-red-600/90" />
+              <Trash size={16} className="text-white group-hover:text-red-400" />
             </button>
           </div>
         </div>
