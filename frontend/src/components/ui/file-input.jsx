@@ -413,7 +413,11 @@ const FileInput = ({
 
     setState('loading');
     try {
-      await onFileChange?.(files);
+      // Add minimum loading time to show animation
+      const [result] = await Promise.all([
+        onFileChange?.(files),
+        new Promise(resolve => setTimeout(resolve, 3500)) // Minimum 1 second loading
+      ]);
     } catch (error) {
       console.error(error);
       setState('idle');
@@ -444,7 +448,11 @@ const FileInput = ({
 
     setState('loading');
     try {
-      await onFileChange?.(files);
+      // Add minimum loading time to show animation
+      const [result] = await Promise.all([
+        onFileChange?.(files),
+        new Promise(resolve => setTimeout(resolve, 3500)) // Minimum 1 second loading
+      ]);
     } catch (error) {
       console.error(error);
       setState('idle');
