@@ -10,6 +10,7 @@ import { LayoutDashboard, Video, BarChart3, Settings, User, UserCircle, ChevronD
 import FileInput from './components/ui/file-input'
 import { motion } from 'framer-motion'
 import RecruiterView from './components/RecruiterView'
+import { NotFound } from './components/ui/ghost-404-page'
 
 import { TbClipboardCopy } from 'react-icons/tb'
 import { ProfileForm } from './components/ui/profile-form'
@@ -238,8 +239,11 @@ function App() {
       {/* Recruiter Route - No sidebar, clean layout */}
       <Route path="/api/videos/share/:shareId" element={<RecruiterView />} />
       
+      {/* 404 Error Page - No sidebar, clean layout */}
+      <Route path="/404" element={<NotFound />} />
+      
       {/* Admin Routes - Full layout with sidebar */}
-      <Route path="/*" element={
+      <Route path="/" element={
         <div className="app-layout">
           <Toaster ref={toasterRef} defaultPosition="top-right" />
           <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
@@ -1050,6 +1054,9 @@ function App() {
       </div>
     </div>
         } />
+      
+      {/* Fallback route for all unmatched paths */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }
