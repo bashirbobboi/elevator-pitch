@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import './App.css'
 import Card from './components/card/card.component'
 import './components/card/card.styles.css'
@@ -21,6 +21,7 @@ const API_BASE = 'http://localhost:5001/api'
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [count, setCount] = useState(0)
   const [videos, setVideos] = useState([])
   const [analytics, setAnalytics] = useState(null)
@@ -1106,8 +1107,17 @@ function App() {
                     <button 
                       className='action-btn view-btn'
                       onClick={() => {
-                        setViewingVideo(video)
-                        setActivePage('view-pitch')
+                        if (video.shareId) {
+                          navigate(`/api/videos/share/${video.shareId}`)
+                        } else {
+                          toasterRef.current?.show({
+                            title: 'Error',
+                            message: 'No share link available for this pitch',
+                            variant: 'error',
+                            position: 'top-right',
+                            duration: 3000
+                          });
+                        }
                       }}
                     >
                       View Pitch
