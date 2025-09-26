@@ -4,6 +4,7 @@ import linkedInLogo from '../assets/linkedIN.png';
 import portfolioLogo from '../assets/portfolio.png';
 import downloadGif from '../assets/download2.gif';
 import playGif from '../assets/play.png';
+import workLogo from '../assets/work.png';
 
 const RecruiterView = () => {
   const { shareId } = useParams();
@@ -122,7 +123,7 @@ const RecruiterView = () => {
       {/* Top section with profile layout */}
       <div 
         className="w-full px-8 py-12"
-        style={{ backgroundColor: '#f1efe0' }}
+        style={{ backgroundColor: '#a2ab82' }}
       >
           <div className="max-w-6xl mx-auto flex items-center gap-12">
             {/* Profile Picture - Left Side */}
@@ -148,12 +149,12 @@ const RecruiterView = () => {
             {/* Profile Info - Center */}
             <div className="flex-1">
               <div className="mb-8">
-                <h1 className="text-5xl font-bold text-gray-900 mb-4">
+                <h1 className="text-4xl font-bold text-gray-900 mb-4">
                   {profile?.firstName?.toUpperCase()} {profile?.lastName?.toUpperCase()}
                 </h1>
                 <div className="flex items-center gap-3 mb-6">
                   <div className="bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                    <span>💼</span>
+                    <img src={workLogo} alt="Work" className="w-6 h-6" />
                     <span className="text-sm font-medium">{video?.title || `${profile?.firstName} ${profile?.lastName} - Software Developer`}</span>
                   </div>
                 </div>
@@ -166,7 +167,20 @@ const RecruiterView = () => {
                     href={profile.portfolioUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:bg-gray-700 text-white hover:text-[#f1efe0] px-4 py-2 rounded-lg flex items-center gap-2 transition-colors" style={{ backgroundColor: 'rgb(0, 0, 0, 0.8)' }}
+                    className="btn-grad text-white hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                    style={{
+                      backgroundImage: 'linear-gradient(to right, #485563 0%, #29323c 51%, #485563 100%)',
+                      backgroundSize: '200% auto',
+                      transition: '0.5s',
+                      boxShadow: '0 0 20px #eee',
+                      borderRadius: '10px',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundPosition = 'right center';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundPosition = 'left center';
+                    }}
                   >
                     <img 
                         src={portfolioLogo} 
@@ -181,7 +195,21 @@ const RecruiterView = () => {
                     href={profile.linkedInUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                     className="hover:bg-blue-700 text-white hover:text-[#f1efe0] px-4 py-2 rounded-lg flex items-center gap-2 transition-colors" style={{ backgroundColor: 'rgb(0, 114, 177)' }}
+                    className="btn-grad text-white hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                    style={{
+                      backgroundImage: 'linear-gradient(to right, #0072B1 0%, #005A8B 51%, #0072B1 100%)',
+                      backgroundSize: '200% auto',
+                      transition: '0.5s',
+                      boxShadow: '0 0 20px #eee',
+                      borderRadius: '10px',
+            
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundPosition = 'right center';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundPosition = 'left center';
+                    }}
                   >
                     <img 
                       src={linkedInLogo} 
@@ -247,7 +275,7 @@ const RecruiterView = () => {
       </div>
 
       {/* Resume Display Section */}
-      <div className="min-h-[60vh] w-full bg-white px-8 py-12">
+      <div className="min-h-[60vh] w-full px-8 py-12" style={{ backgroundColor: '#f4f4f2' }}>
         <div className="max-w-4xl mx-auto">
           {profile?.resume ? (
             <div className="w-full h-[130vh] border border-gray-300 rounded-lg overflow-hidden shadow-lg">
