@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import linkedInLogo from '../assets/linkedIN.png';
+import portfolioLogo from '../assets/portfolio.png';
 
 const RecruiterView = () => {
   const { shareId } = useParams();
@@ -183,23 +185,31 @@ const RecruiterView = () => {
                   href={profile.portfolioUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                    className="hover:bg-gray-700 text-white hover:text-[#f1efe0] px-4 py-2 rounded-lg flex items-center gap-2 transition-colors" style={{ backgroundColor: 'rgb(0, 0, 0, 0.8)' }}
                 >
-                  <span>🌐</span>
+                  <img 
+                      src={portfolioLogo} 
+                      alt="Portfolio" 
+                      className="w-6 h-6"
+                    />
                   Portfolio
                 </a>
               )}
-              {profile?.linkedInUrl && (
-                <a 
-                  href={profile.linkedInUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-                >
-                  <span>💼</span>
-                  LinkedIn
-                </a>
-              )}
+                {profile?.linkedInUrl && (
+                  <a 
+                    href={profile.linkedInUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                     className="hover:bg-blue-700 text-white hover:text-[#f1efe0] px-4 py-2 rounded-lg flex items-center gap-2 transition-colors" style={{ backgroundColor: 'rgb(0, 114, 177)' }}
+                  >
+                    <img 
+                      src={linkedInLogo} 
+                      alt="LinkedIn" 
+                      className="w-6 h-6"
+                    />
+                    LinkedIn
+                  </a>
+                )}
             </div>
           </div>
         </div>
