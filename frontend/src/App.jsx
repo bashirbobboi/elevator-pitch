@@ -29,6 +29,7 @@ function App() {
   const [profile, setProfile] = useState(null)
   const [profileLoading, setProfileLoading] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState(null) // Track which video's dropdown is open
   const [viewingVideo, setViewingVideo] = useState(null)
   const [showElevatorPitchForm, setShowElevatorPitchForm] = useState(false)
   const toasterRef = useRef(null)
@@ -36,11 +37,15 @@ function App() {
   // Check if we're on a recruiter route
   const isRecruiterRoute = location.pathname.startsWith('/api/videos/share/')
 
-  useEffect(() => {
+  const fetchVideos = () => {
     fetch('http://localhost:5001/api/videos')
       .then((response) => response.json())
       .then((videos) => setVideos(videos))
       .catch((error) => console.error('Error fetching videos:', error))
+  }
+
+  useEffect(() => {
+    fetchVideos()
     
     // Load admin profile on app start
     fetchProfile()
@@ -49,14 +54,14 @@ function App() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownOpen && !event.target.closest('[data-dropdown]')) {
-        setDropdownOpen(false)
+      if (activeDropdown && !event.target.closest('[data-dropdown]')) {
+        setActiveDropdown(null)
       }
     }
     
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [dropdownOpen])
+  }, [activeDropdown])
 
   useEffect((videoId) => {
     fetch(`http://localhost:5001/api/videos/${videoId}/stats`)
@@ -199,6 +204,66 @@ function App() {
         duration: 4000
       })
       return { success: false, error: 'Failed to upload profile picture' }
+    }
+  }
+
+  const downloadResumeWithButton = async (shareId) => {
+    try {
+      const link = document.createElement('a');
+      link.href = `http://localhost:5001/api/videos/share/${shareId}/resume`;
+      link.download = `${profile?.firstName}_${profile?.lastName}_Resume.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toasterRef.current?.show({
+        title: 'Downloaded!',
+        message: 'Resume with elevator pitch button downloaded',
+        variant: 'success',
+        position: 'top-right',
+        duration: 2000
+      });
+    } catch (error) {
+      console.error('Error downloading resume:', error);
+      toasterRef.current?.show({
+        title: 'Error',
+        message: 'Failed to download resume',
+        variant: 'error',
+        position: 'top-right',
+        duration: 3000
+      });
+    }
+  }
+
+  const deleteVideo = async (videoId) => {
+    try {
+      const response = await fetch(`http://localhost:5001/api/videos/${videoId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Remove video from local state
+        setVideos(videos.filter(video => video._id !== videoId));
+        
+        toasterRef.current?.show({
+          title: 'Deleted!',
+          message: 'Elevator pitch deleted successfully',
+          variant: 'success',
+          position: 'top-right',
+          duration: 2000
+        });
+      } else {
+        throw new Error('Failed to delete video');
+      }
+    } catch (error) {
+      console.error('Error deleting video:', error);
+      toasterRef.current?.show({
+        title: 'Error',
+        message: 'Failed to delete elevator pitch',
+        variant: 'error',
+        position: 'top-right',
+        duration: 3000
+      });
     }
   }
 
@@ -1047,9 +1112,45 @@ function App() {
                     >
                       View Pitch
                     </button>
-                    <button className='action-btn more-btn'>
-                      ⋯
-                    </button>
+                    <div className="relative" data-dropdown>
+                      <button 
+                        className='action-btn more-btn'
+                        onClick={() => setActiveDropdown(activeDropdown === video._id ? null : video._id)}
+                      >
+                        ⋯
+                      </button>
+                      
+                      {activeDropdown === video._id && (
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                          <div className="py-1">
+                            {video.shareId && (
+                              <button
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                style={{ backgroundColor: 'white' }}
+                                onClick={() => {
+                                  downloadResumeWithButton(video.shareId);
+                                  setActiveDropdown(null);
+                                }}
+                              >
+                                📄 Download Resume
+                              </button>
+                            )}
+                            <button
+                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                              style={{ backgroundColor: 'white' }}
+                              onClick={() => {
+                                if (window.confirm('Are you sure you want to delete this elevator pitch? This action cannot be undone.')) {
+                                  deleteVideo(video._id);
+                                  setActiveDropdown(null);
+                                }
+                              }}
+                            >
+                              🗑️ Delete Pitch
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1064,6 +1165,7 @@ function App() {
           onClose={() => setShowElevatorPitchForm(false)}
           profile={profile}
           onUpdateProfile={updateProfile}
+          onPitchCreated={fetchVideos}
         />
       )}
       </div>

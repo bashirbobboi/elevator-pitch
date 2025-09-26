@@ -36,7 +36,7 @@ const contentVariants = {
   exit: { opacity: 0, x: -50, transition: { duration: 0.2 } },
 };
 
-const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile }) => {
+const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -105,6 +105,11 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile }) => {
 
       // The elevator pitch is already created when video was uploaded
       console.log("Elevator pitch created successfully:", formData);
+      
+      // Call the callback to reload the home page
+      if (onPitchCreated) {
+        onPitchCreated();
+      }
       
       onClose();
     } catch (error) {

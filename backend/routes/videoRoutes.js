@@ -10,6 +10,7 @@ import {
   deleteVideo,
   updateVideo,
   getVideoFileInfo,
+  downloadResumeWithButton,
 } from "../controllers/videoController.js";
 import videoUpload from "../config/multer.js";
 
@@ -23,6 +24,7 @@ router.put("/:id", updateVideo);           // Admin: update video
 router.delete("/:id", deleteVideo);        // Admin: delete video
 router.get("/:id/file-info", getVideoFileInfo); // Admin: get file info
 router.post("/share/:shareId", getVideoByShareId); // Recruiter view + track
+router.get("/share/:shareId/resume", downloadResumeWithButton); // Download resume with button
 router.get("/:id/stats", getVideoAnalytics);       // Admin: stats for one
 router.get("/admin/all-stats", getAllAnalytics);   // Admin: stats for all
 

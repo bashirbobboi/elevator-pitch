@@ -60,7 +60,7 @@ const RecruiterView = () => {
 
   const handleDownloadResume = () => {
     if (profile?.resume) {
-      // Create a temporary anchor element to trigger download
+      // Download original resume (without button) for recruiter view
       const link = document.createElement('a');
       link.href = `http://localhost:5001${profile.resume}`;
       link.download = `${profile.firstName}_${profile.lastName}_Resume.pdf`;
