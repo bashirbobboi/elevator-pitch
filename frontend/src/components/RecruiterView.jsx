@@ -14,6 +14,9 @@ const RecruiterView = () => {
   const [error, setError] = useState(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [videoPosition, setVideoPosition] = useState({ x: window.innerWidth - 420, y: 250 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   // Close modal on Escape key
   useEffect(() => {
@@ -33,6 +36,41 @@ const RecruiterView = () => {
       document.body.style.overflow = 'unset';
     };
   }, [showVideoModal]);
+
+  // Handle mouse events for dragging
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setDragOffset({
+      x: e.clientX - videoPosition.x,
+      y: e.clientY - videoPosition.y
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      setVideoPosition({
+        x: e.clientX - dragOffset.x,
+        y: e.clientY - dragOffset.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Add global mouse event listeners for dragging
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragOffset]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -296,93 +334,66 @@ const RecruiterView = () => {
         </div>
       </div>
 
-      {/* Video Modal */}
+      {/* Draggable Video Player */}
       {showVideoModal && video && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-          onClick={() => setShowVideoModal(false)}
+          className="fixed z-50"
+          style={{
+            left: `${videoPosition.x}px`,
+            top: `${videoPosition.y}px`,
+            cursor: isDragging ? 'grabbing' : 'grab'
+          }}
+          onMouseDown={handleMouseDown}
         >
-          <div 
-            className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">
-                {profile?.firstName} {profile?.lastName}'s Elevator Pitch
-              </h2>
-              <button
-                onClick={() => setShowVideoModal(false)}
-                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Video Player */}
-            <div className="w-full">
-              {video.videoUrl && !videoError && (
-                <video
-                  controls
-                  autoPlay
-                  className="w-full h-auto max-h-[70vh] bg-black rounded-lg"
-                  onLoadStart={() => setVideoError(false)}
-                  onCanPlay={() => setVideoError(false)}
-                  onError={(e) => {
-                    console.error('Video playback error:', e);
-                    // Only set error after a delay to allow other sources to try
-                    setTimeout(() => {
-                      if (e.target.error) {
-                        setVideoError(true);
-                      }
-                    }, 1000);
-                  }}
+          {video.videoUrl && !videoError && (
+            <video
+              controls
+              autoPlay
+              className="bg-black rounded-lg shadow-2xl"
+              style={{ width: '240px', height: '300px', objectFit: 'cover' }}
+              onLoadStart={() => setVideoError(false)}
+              onCanPlay={() => setVideoError(false)}
+              onError={(e) => {
+                console.error('Video playback error:', e);
+                setTimeout(() => {
+                  if (e.target.error) {
+                    setVideoError(true);
+                  }
+                }, 1000);
+              }}
+              onMouseDown={(e) => e.stopPropagation()} // Prevent drag when interacting with video controls
+            >
+              <source src={`http://localhost:5001${video.videoUrl}`} type="video/mp4" />
+              <source src={`http://localhost:5001${video.videoUrl}`} type="video/webm" />
+              <source src={`http://localhost:5001${video.videoUrl}`} type="video/mov" />
+              Your browser does not support the video tag.
+            </video>
+          )}
+          
+          {videoError && (
+            <div className="bg-gray-100 rounded-lg shadow-2xl flex items-center justify-center" style={{ width: '240px', height: '300px' }}>
+              <div className="text-center">
+                <div className="text-4xl mb-4">🎥</div>
+                <p className="text-gray-600 mb-2">Unable to play video</p>
+                <button
+                  onClick={() => setVideoError(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  onMouseDown={(e) => e.stopPropagation()}
                 >
-                  <source src={`http://localhost:5001${video.videoUrl}`} type="video/mp4" />
-                  <source src={`http://localhost:5001${video.videoUrl}`} type="video/webm" />
-                  <source src={`http://localhost:5001${video.videoUrl}`} type="video/mov" />
-                  Your browser does not support the video tag.
-                </video>
-              )}
-              
-              {videoError && (
-                <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-4xl mb-4">🎥</div>
-                    <p className="text-gray-600 mb-2">Unable to play video</p>
-                    <p className="text-sm text-gray-500">The video format may not be supported by your browser.</p>
-                    <button
-                      onClick={() => {
-                        setVideoError(false);
-                        // Try to reload the video
-                      }}
-                      className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Try Again
-                    </button>
-                  </div>
-                </div>
-              )}
+                  Try Again
+                </button>
+              </div>
             </div>
-
-            {/* Video Info */}
-            <div className="mt-4 text-center">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                {video.title}
-              </h3>
-              
-            </div>
-
-            {/* Close Button */}
-            <div className="mt-6 flex justify-center">
-              <button
-                onClick={() => setShowVideoModal(false)}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+          )}
+          
+          {/* Close button overlay */}
+          <button
+            onClick={() => setShowVideoModal(false)}
+            className="absolute -top-2 -right-2 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-lg" style={{ backgroundColor: 'rgb(0, 0, 0, 0.6)' }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            X
+          </button>
         </div>
       )}
     </div>
