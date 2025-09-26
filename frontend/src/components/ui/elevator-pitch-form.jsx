@@ -20,6 +20,7 @@ import FileInput from "@/components/ui/file-input";
 
 const steps = [
   { id: "title", title: "Title Your Pitch" },
+  { id: "script", title: "Write Your Script" },
   { id: "resume", title: "Upload Resume" },
   { id: "video", title: "Record Pitch" },
   { id: "profile", title: "Confirm Details" },
@@ -41,6 +42,7 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
+    script: "",
     resume: null,
     video: null,
     profileData: {
@@ -60,6 +62,10 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
   const [hasPermission, setHasPermission] = useState(false);
   const videoRef = useRef(null);
   const recordingTimeRef = useRef(null);
+
+  // Teleprompter overlay states
+  const [scrollY, setScrollY] = useState(0);
+  const [teleprompterSpeed, setTeleprompterSpeed] = useState(1); // pixels per tick
 
   // Update profile data when profile prop changes
   useEffect(() => {
@@ -292,6 +298,20 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
     };
   }, [stream]);
 
+  // Teleprompter scrolling during recording
+  useEffect(() => {
+    if (isRecording && formData.script) {
+      const interval = setInterval(() => {
+        setScrollY(prev => prev + teleprompterSpeed);
+      }, 50); // 50ms interval for smooth scrolling
+
+      return () => clearInterval(interval);
+    } else {
+      // Reset to beginning when not recording
+      setScrollY(0);
+    }
+  }, [isRecording, formData.script, teleprompterSpeed]);
+
   // Format time display
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -305,10 +325,12 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
       case 0:
         return formData.title.trim() !== "";
       case 1:
-        return formData.resume !== null;
+        return formData.script.trim() !== "";
       case 2:
-        return formData.video !== null || recordedBlob !== null;
+        return formData.resume !== null;
       case 3:
+        return formData.video !== null || recordedBlob !== null;
+      case 4:
         return formData.profileData.firstName.trim() !== "" && 
                formData.profileData.lastName.trim() !== "";
       default:
@@ -414,8 +436,36 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
                     </>
                   )}
 
-                  {/* Step 2: Upload Resume */}
+                  {/* Step 2: Write Your Script */}
                   {currentStep === 1 && (
+                    <>
+                      <CardHeader>
+                        <CardTitle>Write Your Script</CardTitle>
+                        <CardDescription>
+                          Write the script for your elevator pitch. This will be displayed in the teleprompter during recording.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <motion.div variants={fadeInUp} className="space-y-2">
+                          <Label htmlFor="script">Pitch Script</Label>
+                          <Textarea
+                            id="script"
+                            placeholder="Hi, I'm [Your Name]. I'm a [Your Role] with [X years] of experience in [Your Field]..."
+                            value={formData.script}
+                            onChange={(e) => updateFormData("script", e.target.value)}
+                            className="min-h-[200px] transition-all duration-300 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+                            rows={10}
+                          />
+                          <p className="text-sm text-gray-600">
+                            💡 Tip: Keep it between 60-90 seconds when spoken aloud. Focus on who you are, what you do, and what value you bring.
+                          </p>
+                        </motion.div>
+                      </CardContent>
+                    </>
+                  )}
+
+                  {/* Step 3: Upload Resume */}
+                  {currentStep === 2 && (
                     <>
                       <CardHeader>
                         <CardTitle>Upload Your Resume</CardTitle>
@@ -443,8 +493,8 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
                     </>
                   )}
 
-                  {/* Step 3: Record Pitch */}
-                  {currentStep === 2 && (
+                  {/* Step 4: Record Pitch */}
+                  {currentStep === 3 && (
                     <>
                       <CardHeader>
                         <CardTitle>Record Your Pitch</CardTitle>
@@ -454,32 +504,124 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
                       </CardHeader>
                       <CardContent className="space-y-6">
                         <motion.div variants={fadeInUp} className="space-y-4">
-                          {/* Camera Preview */}
-                          <div className="relative w-full max-w-md mx-auto">
-                            <video
-                              ref={videoRef}
-                              autoPlay
-                              muted
-                              playsInline
-                              className="w-full h-64 bg-gray-900 rounded-lg object-cover"
-                              style={{ transform: 'scaleX(-1)' }} // Mirror effect
-                            />
-                            
-                            {/* Recording indicator */}
-                            {isRecording && (
-                              <div className="absolute top-4 left-4 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm">
-                                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                                REC {formatTime(recordingTime)} / 1:30
-                              </div>
-                            )}
+                          {/* Camera Preview with Teleprompter Overlay - Only show when not recorded */}
+                          {!recordedBlob && (
+                            <div className="relative w-full max-w-lg mx-auto">
+                              <div className="video-wrapper relative">
+                                <video
+                                  ref={videoRef}
+                                  autoPlay
+                                  muted
+                                  playsInline
+                                  className="w-full h-80 bg-gray-900 rounded-lg object-cover"
+                                  style={{ transform: 'scaleX(-1)' }} // Mirror effect
+                                />
+                                
+                                {/* Recording indicator */}
+                                {isRecording && (
+                                  <div className="absolute top-4 left-4 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm z-20">
+                                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                                    REC {formatTime(recordingTime)} / 1:30
+                                  </div>
+                                )}
 
-                            {/* Time remaining */}
-                            {!isRecording && recordingTime > 0 && (
-                              <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
-                                Recorded: {formatTime(recordingTime)}
+                                {/* Time remaining */}
+                                {!isRecording && recordingTime > 0 && !recordedBlob && (
+                                  <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm z-20">
+                                    Recorded: {formatTime(recordingTime)}
+                                  </div>
+                                )}
+
+                                {/* Eye Level Guide Line */}
+                                <div 
+                                  className="absolute left-0 right-0 pointer-events-none z-20"
+                                  style={{
+                                    top: '40%',
+                                    height: '1px',
+                                    background: 'rgba(255, 255, 255, 0.6)',
+                                    boxShadow: '0 0 2px rgba(0, 0, 0, 0.5)'
+                                  }}
+                                />
+
+                                {/* Teleprompter Overlay */}
+                                {formData.script && (
+                                  <div 
+                                    className="teleprompter-overlay absolute left-0 right-0 bg-black/70 text-white z-10 overflow-hidden"
+                                    style={{
+                                      top: '20%',
+                                      height: '50%', // 70% - 20% = 50%
+                                    }}
+                                  >
+                                    <div 
+                                      className="teleprompter-content text-center px-4 py-2"
+                                      style={{
+                                        transform: `translateY(-${scrollY}px)`,
+                                        transition: 'none'
+                                      }}
+                                    >
+                                      {formData.script.split('\n').map((line, index) => (
+                                        <p 
+                                          key={index} 
+                                          className="text-lg font-medium leading-relaxed mb-4"
+                                          style={{ minHeight: '2rem' }}
+                                        >
+                                          {line || '\u00A0'} {/* Non-breaking space for empty lines */}
+                                        </p>
+                                      ))}
+                                      {/* Add extra space at the end */}
+                                      <div style={{ height: '400px' }}></div>
+                                    </div>
+                                    
+                                    {/* Gradient overlays for smooth fade */}
+                                    <div 
+                                      className="absolute top-0 left-0 right-0 pointer-events-none"
+                                      style={{
+                                        height: '20px',
+                                        background: 'linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)'
+                                      }}
+                                    />
+                                    <div 
+                                      className="absolute bottom-0 left-0 right-0 pointer-events-none"
+                                      style={{
+                                        height: '20px',
+                                        background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)'
+                                      }}
+                                    />
+                                  </div>
+                                )}
                               </div>
-                            )}
-                          </div>
+                            </div>
+                          )}
+
+                          {/* Teleprompter Speed Controls - Only show when not recorded */}
+                          {formData.script && !recordedBlob && (
+                            <div className="flex flex-col items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                              <div className="text-sm font-medium text-gray-700">Teleprompter Speed</div>
+                              <div className="flex gap-2">
+                                {[
+                                  { speed: 0.5, label: 'Slow' },
+                                  { speed: 1, label: 'Normal' },
+                                  { speed: 1.5, label: 'Fast' },
+                                  { speed: 2, label: 'Very Fast' }
+                                ].map(({ speed, label }) => (
+                                  <button
+                                    key={speed}
+                                    onClick={() => setTeleprompterSpeed(speed)}
+                                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                                      teleprompterSpeed === speed
+                                        ? 'bg-blue-500 text-white'
+                                        : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                                    }`}
+                                  >
+                                    {label}
+                                  </button>
+                                ))}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                Text scrolls at {teleprompterSpeed}x speed during recording
+                              </div>
+                            </div>
+                          )}
 
                           {/* Controls */}
                           <div className="flex flex-col items-center gap-4">
@@ -519,42 +661,68 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
                             )}
 
                             {recordedBlob && (
-                              <div className="flex gap-3">
-                                <Button
-                                  type="button"
-                                  onClick={resetRecording}
-                                  variant="outline"
-                                  className="px-4 py-2"
-                                >
-                                  Record Again
-                                </Button>
-                                <div className="flex items-center gap-2 text-green-600">
-                                  <Check className="w-4 h-4" />
-                                  <span className="text-sm font-medium">
-                                    Recording Complete ({formatTime(recordingTime)})
-                                  </span>
+                              <div className="space-y-4">
+                                {/* Video Preview */}
+                                <div className="w-full max-w-lg mx-auto">
+                                  <h3 className="text-lg font-semibold mb-3 text-center">Preview Your Recording</h3>
+                                  <div className="relative bg-gray-900 rounded-lg overflow-hidden">
+                                    <video
+                                      controls
+                                      className="w-full h-80 object-cover"
+                                      src={URL.createObjectURL(recordedBlob)}
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Controls */}
+                                <div className="flex flex-col items-center gap-3">
+                                  <div className="flex items-center gap-2 text-green-600">
+                                    <Check className="w-4 h-4" />
+                                    <span className="text-sm font-medium">
+                                      Recording Complete ({formatTime(recordingTime)})
+                                    </span>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    onClick={resetRecording}
+                                    variant="outline"
+                                    className="px-6 py-2"
+                                  >
+                                    Record Again
+                                  </Button>
                                 </div>
                               </div>
                             )}
                           </div>
 
                           {/* Instructions */}
-                          <div className="text-center text-sm text-gray-600 space-y-2">
-                            <p>📹 <strong>Tips for a great pitch:</strong></p>
-                            <ul className="text-xs space-y-1">
-                              <li>• Look directly at the camera</li>
-                              <li>• Speak clearly and at a moderate pace</li>
-                              <li>• Keep it concise - you have 90 seconds</li>
-                              <li>• Mention your name, skills, and what you're looking for</li>
-                            </ul>
-                          </div>
+                          {!recordedBlob ? (
+                            <div className="text-center text-sm text-gray-600 space-y-2">
+                              <p>📹 <strong>Tips for a great pitch:</strong></p>
+                              <ul className="text-xs space-y-1">
+                                <li>• Look directly at the camera</li>
+                                <li>• Speak clearly and at a moderate pace</li>
+                                <li>• Keep it concise - you have 90 seconds</li>
+                                <li>• Mention your name, skills, and what you're looking for</li>
+                              </ul>
+                            </div>
+                          ) : (
+                            <div className="text-center text-sm text-gray-600 space-y-2">
+                              <p>✅ <strong>Great job!</strong></p>
+                              <p className="text-xs">
+                                Review your recording above. If you're happy with it, click "Next" to continue.
+                                <br />
+                                If you'd like to try again, click "Record Again".
+                              </p>
+                            </div>
+                          )}
                         </motion.div>
                       </CardContent>
                     </>
                   )}
 
-                  {/* Step 4: Confirm Profile Details */}
-                  {currentStep === 3 && (
+                  {/* Step 5: Confirm Profile Details */}
+                  {currentStep === 4 && (
                     <>
                       <CardHeader>
                         <CardTitle>Confirm Your Details</CardTitle>
