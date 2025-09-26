@@ -371,8 +371,7 @@ function App() {
           <img src={logo} alt="Elevator Pitch Logo" className="app-logo" />
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button 
-              className='action-btn insights-btn' 
-              style={{ padding: '0.5rem 1rem' }}
+              className='btn-grad'
               onClick={() => setShowElevatorPitchForm(true)}
             >
               New Pitch

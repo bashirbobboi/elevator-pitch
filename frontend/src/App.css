@@ -12,6 +12,29 @@ body {
   font-family: 'Lexend', 'ubuntu', sans-serif, 'georgia', serif;
 }
 
+/* Gradient button styles */
+.btn-grad {
+  background-image: linear-gradient(to right, #F0C27B 0%, #4B1248 51%, #F0C27B 100%);
+  margin: 10px;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  box-shadow: 0 0 20px #eee;
+  border-radius: 10px;
+  display: block;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-grad:hover {
+  background-position: right center;
+  color: #fff;
+  text-decoration: none;
+}
+
 .app-layout {
   display: flex;
   width: 100%;
