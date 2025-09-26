@@ -19,8 +19,8 @@ export async function addButtonToPdf(inputPath, outputPath, linkUrl) {
     const { width, height } = firstPage.getSize();
 
     // Button dimensions and position (top-right corner)
-    const buttonWidth = 130;
-    const buttonHeight = 35;
+    const buttonWidth = 100;
+    const buttonHeight = 20;
     const margin = 15;
     const buttonX = width - buttonWidth - margin;
     const buttonY = height - buttonHeight - margin;
@@ -29,7 +29,7 @@ export async function addButtonToPdf(inputPath, outputPath, linkUrl) {
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
     // Button text
-    const buttonText = '> Play Intro';
+    const buttonText = 'Play Intro';
     
     // Calculate text positioning for centering
     const fontSize = 11;
@@ -43,8 +43,8 @@ export async function addButtonToPdf(inputPath, outputPath, linkUrl) {
       y: buttonY,
       width: buttonWidth,
       height: buttonHeight,
-      color: rgb(0.2, 0.6, 0.9), // Blue background
-      borderColor: rgb(0.15, 0.45, 0.75),
+      color: rgb(161/255, 4/255, 90/255), // Your custom color rgb(161, 4, 90)
+      borderColor: rgb(140/255, 3/255, 80/255), // Slightly darker border
       borderWidth: 1,
       borderOpacity: 1,
       opacity: 1
@@ -115,10 +115,15 @@ export async function addButtonToPdf(inputPath, outputPath, linkUrl) {
  */
 export async function createDownloadableResume(originalResumePath, shareId) {
   try {
-    const fileName = path.basename(originalResumePath);
+    // Normalize the path - remove leading slash if present and make it relative to backend directory
+    const normalizedPath = originalResumePath.startsWith('/') 
+      ? originalResumePath.substring(1) 
+      : originalResumePath;
+    
+    const fileName = path.basename(normalizedPath);
     const fileNameWithoutExt = path.parse(fileName).name;
     const downloadablePath = path.join(
-      path.dirname(originalResumePath),
+      path.dirname(normalizedPath),
       `${fileNameWithoutExt}_downloadable.pdf`
     );
 
@@ -126,7 +131,7 @@ export async function createDownloadableResume(originalResumePath, shareId) {
     const pitchUrl = `http://localhost:5173/api/videos/share/${shareId}`;
 
     // Add button to PDF
-    await addButtonToPdf(originalResumePath, downloadablePath, pitchUrl);
+    await addButtonToPdf(normalizedPath, downloadablePath, pitchUrl);
 
     return downloadablePath;
   } catch (error) {
