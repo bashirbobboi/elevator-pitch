@@ -280,9 +280,18 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
   const resetRecording = () => {
     setRecordedBlob(null);
     setRecordingTime(0);
+    setScrollY(0); // Reset teleprompter scroll
     updateFormData("video", null);
     if (recordingTimeRef.current) {
       clearInterval(recordingTimeRef.current);
+    }
+    
+    // Restart camera stream if it was stopped
+    if (!stream || !stream.active) {
+      initializeCamera();
+    } else if (videoRef.current) {
+      // Ensure video element is connected to the stream
+      videoRef.current.srcObject = stream;
     }
   };
 
@@ -311,6 +320,13 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
       setScrollY(0);
     }
   }, [isRecording, formData.script, teleprompterSpeed]);
+
+  // Ensure video element shows live stream when switching back from recorded view
+  useEffect(() => {
+    if (!recordedBlob && stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [recordedBlob, stream]);
 
   // Format time display
   const formatTime = (seconds) => {
@@ -559,15 +575,59 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
                                         transition: 'none'
                                       }}
                                     >
-                                      {formData.script.split('\n').map((line, index) => (
-                                        <p 
-                                          key={index} 
-                                          className="text-lg font-medium leading-relaxed mb-4"
-                                          style={{ minHeight: '2rem' }}
-                                        >
-                                          {line || '\u00A0'} {/* Non-breaking space for empty lines */}
-                                        </p>
-                                      ))}
+                                      {(() => {
+                                        // Function to wrap text at 25 characters per line
+                                        const wrapText = (text, maxLength = 25) => {
+                                          if (!text) return ['\u00A0'];
+                                          
+                                          const words = text.split(' ');
+                                          const lines = [];
+                                          let currentLine = '';
+                                          
+                                          words.forEach(word => {
+                                            // Check if adding this word would exceed the limit
+                                            const testLine = currentLine ? `${currentLine} ${word}` : word;
+                                            
+                                            if (testLine.length <= maxLength) {
+                                              currentLine = testLine;
+                                            } else {
+                                              // Start new line
+                                              if (currentLine) {
+                                                lines.push(currentLine);
+                                              }
+                                              currentLine = word;
+                                            }
+                                          });
+                                          
+                                          // Add the last line
+                                          if (currentLine) {
+                                            lines.push(currentLine);
+                                          }
+                                          
+                                          return lines.length > 0 ? lines : ['\u00A0'];
+                                        };
+                                        
+                                        // Process all lines from the script
+                                        const allWrappedLines = [];
+                                        formData.script.split('\n').forEach(originalLine => {
+                                          const wrappedLines = wrapText(originalLine.trim());
+                                          allWrappedLines.push(...wrappedLines);
+                                          // Add extra spacing between original paragraphs
+                                          if (originalLine.trim()) {
+                                            allWrappedLines.push('\u00A0');
+                                          }
+                                        });
+                                        
+                                        return allWrappedLines.map((line, index) => (
+                                          <p 
+                                            key={index} 
+                                            className="text-lg font-medium leading-relaxed mb-4"
+                                            style={{ minHeight: '2rem' }}
+                                          >
+                                            {line}
+                                          </p>
+                                        ));
+                                      })()}
                                       {/* Add extra space at the end */}
                                       <div style={{ height: '400px' }}></div>
                                     </div>
