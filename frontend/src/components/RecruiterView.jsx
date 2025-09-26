@@ -73,9 +73,19 @@ const RecruiterView = () => {
   }, [isDragging, dragOffset]);
 
   useEffect(() => {
+    let isCancelled = false; // Prevent double execution in StrictMode
+    
     const fetchData = async () => {
+      if (isCancelled) return;
+      
       try {
         setLoading(true);
+        
+        // Generate or get viewerId before making the request
+        let viewerId = localStorage.getItem('viewerId');
+        if (!viewerId) {
+          viewerId = generateViewerId();
+        }
         
         // Fetch video data
         const videoResponse = await fetch(`http://localhost:5001/api/videos/share/${shareId}`, {
@@ -83,37 +93,42 @@ const RecruiterView = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            viewerId: localStorage.getItem('viewerId') || generateViewerId()
-          })
+          body: JSON.stringify({ viewerId })
         });
 
         if (!videoResponse.ok) {
-          setError('Video not found');
+          if (!isCancelled) setError('Video not found');
           return;
         }
 
         const videoData = await videoResponse.json();
-        setVideo(videoData);
+        if (!isCancelled) setVideo(videoData);
 
         // Fetch profile data
         const profileResponse = await fetch('http://localhost:5001/api/profile');
         if (profileResponse.ok) {
           const profileData = await profileResponse.json();
-          setProfile(profileData);
+          if (!isCancelled) setProfile(profileData);
         }
 
       } catch (err) {
-        setError('Failed to load content');
-        console.error('Error fetching data:', err);
+        if (!isCancelled) {
+          setError('Failed to load content');
+          console.error('Error fetching data:', err);
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) setLoading(false);
       }
     };
 
     if (shareId) {
       fetchData();
     }
+
+    // Cleanup function to prevent double execution
+    return () => {
+      isCancelled = true;
+    };
   }, [shareId]);
 
   const generateViewerId = () => {

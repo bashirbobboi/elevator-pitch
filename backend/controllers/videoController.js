@@ -187,18 +187,37 @@ export const getVideoByShareId = async (req, res) => {
 
     if (!video) return res.status(404).json({ error: "Video not found" });
 
-    // Increment total views
-    video.viewCount += 1;
-
-    // Track unique viewers
-    if (viewerId && !video.uniqueViewers.includes(viewerId)) {
-      video.uniqueViewers.push(viewerId);
+    // Initialize viewerSessions if it doesn't exist
+    if (!video.viewerSessions) {
+      video.viewerSessions = new Map();
     }
 
-    // Update last viewed
-    video.lastViewed = new Date();
+    const now = new Date();
+    const sessionKey = viewerId || 'anonymous';
+    const lastViewTime = video.viewerSessions.get(sessionKey);
+    
+    // Only count as new view if:
+    // 1. No previous view from this viewer, OR
+    // 2. Last view was more than 30 seconds ago (prevents rapid refresh spam)
+    const shouldCountView = !lastViewTime || (now - new Date(lastViewTime)) > 30000;
 
-    await video.save();
+    if (shouldCountView) {
+      // Increment total views
+      video.viewCount += 1;
+      
+      // Update session tracking
+      video.viewerSessions.set(sessionKey, now.toISOString());
+      
+      // Track unique viewers (only add if not already in array)
+      if (viewerId && !video.uniqueViewers.includes(viewerId)) {
+        video.uniqueViewers.push(viewerId);
+      }
+
+      // Update last viewed
+      video.lastViewed = now;
+
+      await video.save();
+    }
 
     // Return recruiter-friendly response
     res.json({

@@ -27,6 +27,11 @@ const videoSchema = new mongoose.Schema(
     lastViewed: { 
         type: Date 
     }, // last view timestamp
+    viewerSessions: {
+        type: Map,
+        of: String,
+        default: new Map()
+    }, // Track viewer sessions to prevent duplicate views
   },
   { timestamps: true } // adds createdAt & updatedAt automatically
 );
