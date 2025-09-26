@@ -220,7 +220,7 @@ const RecruiterView = () => {
                     href={profile.portfolioUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-grad text-white hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                    className="text-white hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                     style={{
                       backgroundImage: 'linear-gradient(to right, #485563 0%, #29323c 51%, #485563 100%)',
                       backgroundSize: '200% auto',
@@ -247,7 +247,7 @@ const RecruiterView = () => {
                     href={profile.linkedInUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-grad text-white hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                    className="text-white hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                     style={{
                       backgroundImage: 'linear-gradient(to right, #0072B1 0%, #005A8B 51%, #0072B1 100%)',
                       backgroundSize: '200% auto',
@@ -280,7 +280,7 @@ const RecruiterView = () => {
                   setVideoError(false);
                   setShowVideoModal(true);
                 }}
-                className="btn-grad px-6 py-4 font-semibold flex items-center justify-center gap-2 w-full"
+                className="px-6 py-4 font-semibold flex items-center justify-center gap-2 w-full"
                 style={{
                   backgroundImage: 'linear-gradient(to right, #EFEFBB 0%, #D4D3DD 51%, #EFEFBB 100%)',
                   backgroundSize: '200% auto',
@@ -302,7 +302,7 @@ const RecruiterView = () => {
               </button>
               <button 
                 onClick={handleDownloadResume}
-                className="btn-grad text-white px-6 py-4 font-semibold flex items-center justify-center gap-2 w-full"
+                className="text-white px-6 py-4 font-semibold flex items-center justify-center gap-2 w-full"
                 style={{
                   backgroundImage: 'linear-gradient(to right, #16222A 0%, #3A6073 51%, #16222A 100%)',
                   backgroundSize: '200% auto',
