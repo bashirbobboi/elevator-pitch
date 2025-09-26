@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import linkedInLogo from '../assets/linkedIN.png';
 import portfolioLogo from '../assets/portfolio.png';
+import downloadGif from '../assets/download2.gif';
+import playGif from '../assets/play.png';
 
 const RecruiterView = () => {
   const { shareId } = useParams();
@@ -122,79 +124,58 @@ const RecruiterView = () => {
         className="w-full px-8 py-12"
         style={{ backgroundColor: '#f1efe0' }}
       >
-        <div className="max-w-6xl mx-auto flex items-center gap-12">
-          {/* Profile Picture - Left Side */}
-          <div className="flex-shrink-0">
-            <div 
-              className="rounded-full overflow-hidden border-4 border-white shadow-lg"
-              style={{ width: '240px', height: '240px' }}
-            >
-              {profile?.profilePicture ? (
-                <img 
-                  src={`http://localhost:5001${profile.profilePicture}`}
-                  alt={`${profile.firstName} ${profile.lastName}`}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-500 text-lg">No Photo</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Profile Info - Right Side */}
-          <div className="flex-1">
-            <div className="mb-8">
-              <h1 className="text-5xl font-bold text-gray-900 mb-4">
-                {profile?.firstName?.toUpperCase()} {profile?.lastName?.toUpperCase()}
-              </h1>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                  <span>💼</span>
-                  <span className="text-sm font-medium">{video?.title || `${profile?.firstName} ${profile?.lastName} - Software Developer`}</span>
-                </div>
+          <div className="max-w-6xl mx-auto flex items-center gap-12">
+            {/* Profile Picture - Left Side */}
+            <div className="flex-shrink-0">
+              <div 
+                className="rounded-full overflow-hidden border-4 border-white shadow-lg"
+                style={{ width: '240px', height: '240px' }}
+              >
+                {profile?.profilePicture ? (
+                  <img 
+                    src={`http://localhost:5001${profile.profilePicture}`}
+                    alt={`${profile.firstName} ${profile.lastName}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-500 text-lg">No Photo</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-4 mb-6 w-full max-w-[80%]">
-              <button 
-                onClick={() => {
-                  setVideoError(false);
-                  setShowVideoModal(true);
-                }}
-                className="bg-green-400 hover:bg-green-500 text-black px-6 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors w-full"
-              >
-                <span>▶</span>
-                Play Elevator Pitch
-              </button>
-              <button 
-                onClick={handleDownloadResume}
-                className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors w-full"
-              >
-                <span>⬇</span>
-                Download Resume
-              </button>
-            </div>
+            {/* Profile Info - Center */}
+            <div className="flex-1">
+              <div className="mb-8">
+                <h1 className="text-5xl font-bold text-gray-900 mb-4">
+                  {profile?.firstName?.toUpperCase()} {profile?.lastName?.toUpperCase()}
+                </h1>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                    <span>💼</span>
+                    <span className="text-sm font-medium">{video?.title || `${profile?.firstName} ${profile?.lastName} - Software Developer`}</span>
+                  </div>
+                </div>
+              </div>
 
-            {/* Links */}
-            <div className="flex gap-4">
-              {profile?.portfolioUrl && (
-                <a 
-                  href={profile.portfolioUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              {/* Links */}
+              <div className="flex gap-4">
+                {profile?.portfolioUrl && (
+                  <a 
+                    href={profile.portfolioUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="hover:bg-gray-700 text-white hover:text-[#f1efe0] px-4 py-2 rounded-lg flex items-center gap-2 transition-colors" style={{ backgroundColor: 'rgb(0, 0, 0, 0.8)' }}
-                >
-                  <img 
-                      src={portfolioLogo} 
-                      alt="Portfolio" 
-                      className="w-6 h-6"
-                    />
-                  Portfolio
-                </a>
-              )}
+                  >
+                    <img 
+                        src={portfolioLogo} 
+                        alt="Portfolio" 
+                        className="w-6 h-6"
+                      />
+                    Portfolio
+                  </a>
+                )}
                 {profile?.linkedInUrl && (
                   <a 
                     href={profile.linkedInUrl}
@@ -210,9 +191,59 @@ const RecruiterView = () => {
                     LinkedIn
                   </a>
                 )}
+              </div>
+            </div>
+
+            {/* Action Buttons - Right Side */}
+            <div className="flex flex-col gap-4 w-80">
+              <button 
+                onClick={() => {
+                  setVideoError(false);
+                  setShowVideoModal(true);
+                }}
+                className="btn-grad px-6 py-4 font-semibold flex items-center justify-center gap-2 w-full"
+                style={{
+                  backgroundImage: 'linear-gradient(to right, #EFEFBB 0%, #D4D3DD 51%, #EFEFBB 100%)',
+                  backgroundSize: '200% auto',
+                  transition: '0.5s',
+                  boxShadow: '0 0 20px #eee',
+                  borderRadius: '20px',
+                  textTransform: 'uppercase',
+                  color: 'black'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundPosition = 'right center';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundPosition = 'left center';
+                }}
+              >
+                <img src={playGif} alt="Play" className="w-6 h-6" />
+                Play Elevator Pitch
+              </button>
+              <button 
+                onClick={handleDownloadResume}
+                className="btn-grad text-white px-6 py-4 font-semibold flex items-center justify-center gap-2 w-full"
+                style={{
+                  backgroundImage: 'linear-gradient(to right, #16222A 0%, #3A6073 51%, #16222A 100%)',
+                  backgroundSize: '200% auto',
+                  transition: '0.5s',
+                  boxShadow: '0 0 20px #eee',
+                  borderRadius: '20px',
+                  textTransform: 'uppercase'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundPosition = 'right center';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundPosition = 'left center';
+                }}
+              >
+                <img src={downloadGif} alt="Download" className="w-6 h-6" />
+                Download Resume
+              </button>
             </div>
           </div>
-        </div>
       </div>
 
       {/* Resume Display Section */}
