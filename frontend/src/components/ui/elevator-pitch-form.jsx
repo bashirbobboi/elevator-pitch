@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Check, Loader2, Upload, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,16 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
       portfolioUrl: profile?.portfolioUrl || "",
     }
   });
+
+  // Video recording states
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [stream, setStream] = useState(null);
+  const [recordedBlob, setRecordedBlob] = useState(null);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [hasPermission, setHasPermission] = useState(false);
+  const videoRef = useRef(null);
+  const recordingTimeRef = useRef(null);
 
   // Update profile data when profile prop changes
   useEffect(() => {
@@ -146,8 +156,7 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
     }
   };
 
-  const handleVideoUpload = async (files) => {
-    const file = files[0];
+  const handleVideoUpload = async (file) => {
     if (!file) return;
 
     try {
@@ -164,6 +173,7 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
         const result = await response.json();
         console.log('Video uploaded successfully:', result);
         updateFormData("video", result);
+        return result;
       } else {
         const error = await response.json();
         throw new Error(error.error || 'Failed to upload video');
@@ -174,6 +184,121 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
     }
   };
 
+  // Video recording functions
+  const initializeCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 640, height: 480, facingMode: 'user' },
+        audio: true
+      });
+      setStream(mediaStream);
+      setHasPermission(true);
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+      }
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      alert('Unable to access camera and microphone. Please check permissions.');
+    }
+  };
+
+  const startRecording = () => {
+    if (!stream) return;
+
+    // Check MediaRecorder support and choose best format
+    let options = {};
+    if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+      options = { mimeType: 'video/webm;codecs=vp9' };
+    } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+      options = { mimeType: 'video/webm;codecs=vp8' };
+    } else if (MediaRecorder.isTypeSupported('video/webm')) {
+      options = { mimeType: 'video/webm' };
+    } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+      options = { mimeType: 'video/mp4' };
+    }
+
+    const recorder = new MediaRecorder(stream, options);
+
+    const chunks = [];
+    recorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        chunks.push(event.data);
+      }
+    };
+
+    recorder.onstop = async () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      setRecordedBlob(blob);
+      
+      // Convert blob to file object and upload
+      const file = new File([blob], `pitch-recording-${Date.now()}.webm`, {
+        type: 'video/webm'
+      });
+      
+      try {
+        await handleVideoUpload(file);
+      } catch (error) {
+        console.error('Failed to upload recorded video:', error);
+        // Still keep the file locally for potential retry
+        updateFormData("video", file);
+      }
+    };
+
+    recorder.start();
+    setMediaRecorder(recorder);
+    setIsRecording(true);
+    setRecordingTime(0);
+
+    // Start timer
+    recordingTimeRef.current = setInterval(() => {
+      setRecordingTime(prev => {
+        if (prev >= 90) { // 90 second limit
+          stopRecording();
+          return 90;
+        }
+        return prev + 1;
+      });
+    }, 1000);
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+    setIsRecording(false);
+    if (recordingTimeRef.current) {
+      clearInterval(recordingTimeRef.current);
+    }
+  };
+
+  const resetRecording = () => {
+    setRecordedBlob(null);
+    setRecordingTime(0);
+    updateFormData("video", null);
+    if (recordingTimeRef.current) {
+      clearInterval(recordingTimeRef.current);
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      if (recordingTimeRef.current) {
+        clearInterval(recordingTimeRef.current);
+      }
+    };
+  }, [stream]);
+
+  // Format time display
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   // Check if step is valid for next button
   const isStepValid = () => {
     switch (currentStep) {
@@ -182,7 +307,7 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
       case 1:
         return formData.resume !== null;
       case 2:
-        return formData.video !== null;
+        return formData.video !== null || recordedBlob !== null;
       case 3:
         return formData.profileData.firstName.trim() !== "" && 
                formData.profileData.lastName.trim() !== "";
@@ -277,7 +402,7 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
                           <Label htmlFor="title">Pitch Title</Label>
                           <Input
                             id="title"
-                            placeholder="e.g. Software Developer Introduction"
+                            placeholder="e.g. Mohammed Bobboi - Software Developer - Amazon"
                             value={formData.title}
                             onChange={(e) =>
                               updateFormData("title", e.target.value)
@@ -324,24 +449,105 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
                       <CardHeader>
                         <CardTitle>Record Your Pitch</CardTitle>
                         <CardDescription>
-                          Upload your elevator pitch video
+                          Record a 90-second elevator pitch using your camera and microphone
                         </CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        <motion.div variants={fadeInUp} className="space-y-2">
-                          <div className="flex justify-center">
-                            <FileInput
-                              accept="video/mp4, video/mov, video/avi"
-                              maxSizeInMB={100}
-                              onFileChange={handleVideoUpload}
-                              allowMultiple={false}
+                      <CardContent className="space-y-6">
+                        <motion.div variants={fadeInUp} className="space-y-4">
+                          {/* Camera Preview */}
+                          <div className="relative w-full max-w-md mx-auto">
+                            <video
+                              ref={videoRef}
+                              autoPlay
+                              muted
+                              playsInline
+                              className="w-full h-64 bg-gray-900 rounded-lg object-cover"
+                              style={{ transform: 'scaleX(-1)' }} // Mirror effect
                             />
+                            
+                            {/* Recording indicator */}
+                            {isRecording && (
+                              <div className="absolute top-4 left-4 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm">
+                                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                                REC {formatTime(recordingTime)} / 1:30
+                              </div>
+                            )}
+
+                            {/* Time remaining */}
+                            {!isRecording && recordingTime > 0 && (
+                              <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                                Recorded: {formatTime(recordingTime)}
+                              </div>
+                            )}
                           </div>
-                          {formData.video && (
-                            <p className="text-sm text-green-600 text-center">
-                              ✓ Video uploaded: {formData.video.name}
-                            </p>
-                          )}
+
+                          {/* Controls */}
+                          <div className="flex flex-col items-center gap-4">
+                            {!hasPermission && (
+                              <Button
+                                type="button"
+                                onClick={initializeCamera}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+                              >
+                                <Video className="w-4 h-4 mr-2" />
+                                Enable Camera & Microphone
+                              </Button>
+                            )}
+
+                            {hasPermission && !recordedBlob && (
+                              <div className="flex gap-3">
+                                {!isRecording ? (
+                                  <Button
+                                    type="button"
+                                    onClick={startRecording}
+                                    className="bg-red-600 hover:bg-red-700 text-white px-6 py-2"
+                                  >
+                                    <div className="w-3 h-3 bg-white rounded-full mr-2"></div>
+                                    Start Recording
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    type="button"
+                                    onClick={stopRecording}
+                                    className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2"
+                                  >
+                                    <div className="w-3 h-3 bg-white mr-2"></div>
+                                    Stop Recording
+                                  </Button>
+                                )}
+                              </div>
+                            )}
+
+                            {recordedBlob && (
+                              <div className="flex gap-3">
+                                <Button
+                                  type="button"
+                                  onClick={resetRecording}
+                                  variant="outline"
+                                  className="px-4 py-2"
+                                >
+                                  Record Again
+                                </Button>
+                                <div className="flex items-center gap-2 text-green-600">
+                                  <Check className="w-4 h-4" />
+                                  <span className="text-sm font-medium">
+                                    Recording Complete ({formatTime(recordingTime)})
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Instructions */}
+                          <div className="text-center text-sm text-gray-600 space-y-2">
+                            <p>📹 <strong>Tips for a great pitch:</strong></p>
+                            <ul className="text-xs space-y-1">
+                              <li>• Look directly at the camera</li>
+                              <li>• Speak clearly and at a moderate pace</li>
+                              <li>• Keep it concise - you have 90 seconds</li>
+                              <li>• Mention your name, skills, and what you're looking for</li>
+                            </ul>
+                          </div>
                         </motion.div>
                       </CardContent>
                     </>

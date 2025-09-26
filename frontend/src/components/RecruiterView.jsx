@@ -7,6 +7,26 @@ const RecruiterView = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+
+  // Close modal on Escape key
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && showVideoModal) {
+        setShowVideoModal(false);
+      }
+    };
+
+    if (showVideoModal) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [showVideoModal]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,6 +157,7 @@ const RecruiterView = () => {
             {/* Action Buttons */}
             <div className="flex flex-col gap-4 mb-6 w-full max-w-[80%]">
               <button 
+                onClick={() => setShowVideoModal(true)}
                 className="bg-green-400 hover:bg-green-500 text-black px-6 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors w-full"
               >
                 <span>▶</span>
@@ -201,6 +222,74 @@ const RecruiterView = () => {
           )}
         </div>
       </div>
+
+      {/* Video Modal */}
+      {showVideoModal && video && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          onClick={() => setShowVideoModal(false)}
+        >
+          <div 
+            className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {profile?.firstName} {profile?.lastName}'s Elevator Pitch
+              </h2>
+              <button
+                onClick={() => setShowVideoModal(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Video Player */}
+            <div className="w-full">
+              {video.videoUrl && (
+                <video
+                  controls
+                  autoPlay
+                  className="w-full h-auto max-h-[70vh] bg-black rounded-lg"
+                  onError={(e) => {
+                    console.error('Video playback error:', e);
+                    alert('Unable to play video. The video format may not be supported.');
+                  }}
+                >
+                  <source src={`http://localhost:5001${video.videoUrl}`} type="video/mp4" />
+                  <source src={`http://localhost:5001${video.videoUrl}`} type="video/webm" />
+                  <source src={`http://localhost:5001${video.videoUrl}`} type="video/mov" />
+                  Your browser does not support the video tag.
+                </video>
+              )}
+            </div>
+
+            {/* Video Info */}
+            <div className="mt-4 text-center">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                {video.title}
+              </h3>
+              <div className="flex justify-center gap-4 text-sm text-gray-600">
+                <span>Views: {video.viewCount}</span>
+                <span>•</span>
+                <span>Unique Viewers: {video.uniqueViewers?.length || 0}</span>
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={() => setShowVideoModal(false)}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
