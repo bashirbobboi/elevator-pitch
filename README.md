@@ -234,7 +234,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-**Your Name** - [@yourusername](https://twitter.com/yourusername) - your.email@example.com
+**Mohammed Bobboi** - [@bashirbobboi](https://twitter.com/bashirbobboi) - bashirbobboi@gmail.com
 
 **Project Link**: [https://github.com/yourusername/elevator-pitch](https://github.com/yourusername/elevator-pitch)
 
@@ -253,7 +253,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **⭐ Star this repository if you found it helpful!**
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/elevator-pitch?style=social)](https://github.com/yourusername/elevator-pitch)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/elevator-pitch?style=social)](https://github.com/yourusername/elevator-pitch)
+[![GitHub stars](https://img.shields.io/github/stars/bashirbobboi/elevator-pitch?style=social)](https://github.com/bashirbobboi/elevator-pitch)
+[![GitHub forks](https://img.shields.io/github/forks/bashirbobboi/elevator-pitch?style=social)](https://github.com/bashirbobboi/elevator-pitch)
 
 </div>
