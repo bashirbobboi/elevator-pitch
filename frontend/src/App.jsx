@@ -5,6 +5,9 @@ import Card from './components/card/card.component'
 import './components/card/card.styles.css'
 import logo from './assets/logo.png'
 import sidebar from './assets/elevatorpitch.png'
+import downloadIcon from './assets/download.png'
+import deleteIcon from './assets/delete.png'
+import copyIcon from './assets/copy.png'
 import { Sidebar, SidebarBody, SidebarLink } from './components/ui/sidebar'
 import { LayoutDashboard, Video, BarChart3, Settings, User, UserCircle, ChevronDown } from 'lucide-react'
 import FileInput from './components/ui/file-input'
@@ -13,7 +16,6 @@ import RecruiterView from './components/RecruiterView'
 import { NotFound } from './components/ui/ghost-404-page'
 import ElevatorPitchForm from './components/ui/elevator-pitch-form'
 
-import { TbClipboardCopy } from 'react-icons/tb'
 import { ProfileForm } from './components/ui/profile-form'
 import Toaster from './components/ui/toast'
 
@@ -1099,7 +1101,7 @@ function App() {
                     })
                   }}
                 >
-                      <TbClipboardCopy />
+                      <img src={copyIcon} alt="Copy" className="w-10 h-6" />
                     </button>
                     <button className='action-btn insights-btn'>
                       View Insights
@@ -1142,7 +1144,8 @@ function App() {
                                   setActiveDropdown(null);
                                 }}
                               >
-                                📄 Download Resume
+                                <img src={downloadIcon} alt="Download" className="w-4 h-4" />
+                                Download Resume
                               </button>
                             )}
                             <button
@@ -1155,7 +1158,8 @@ function App() {
                                 }
                               }}
                             >
-                              🗑️ Delete Pitch
+                              <img src={deleteIcon} alt="Delete" className="w-4 h-4" />
+                              Delete Pitch
                             </button>
                           </div>
                         </div>
