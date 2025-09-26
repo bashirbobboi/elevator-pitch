@@ -210,7 +210,6 @@ const RecruiterView = () => {
                       backgroundImage: 'linear-gradient(to right, #485563 0%, #29323c 51%, #485563 100%)',
                       backgroundSize: '200% auto',
                       transition: '0.5s',
-                      boxShadow: '0 0 20px #eee',
                       borderRadius: '10px',
                     }}
                     onMouseEnter={(e) => {
@@ -238,7 +237,6 @@ const RecruiterView = () => {
                       backgroundImage: 'linear-gradient(to right, #0072B1 0%, #005A8B 51%, #0072B1 100%)',
                       backgroundSize: '200% auto',
                       transition: '0.5s',
-                      boxShadow: '0 0 20px #eee',
                       borderRadius: '10px',
             
                     }}
