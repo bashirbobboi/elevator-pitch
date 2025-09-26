@@ -131,6 +131,13 @@ const RecruiterView = () => {
     };
   }, [shareId]);
 
+  // Auto-play video when page loads
+  useEffect(() => {
+    if (video && !loading && !error) {
+      setShowVideoModal(true);
+    }
+  }, [video, loading, error]);
+
   const generateViewerId = () => {
     const viewerId = 'viewer_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem('viewerId', viewerId);
@@ -362,6 +369,7 @@ const RecruiterView = () => {
             <video
               controls
               autoPlay
+              muted
               className="bg-black rounded-lg shadow-2xl"
               style={{ width: '240px', height: '300px', objectFit: 'cover' }}
               onLoadStart={() => setVideoError(false)}

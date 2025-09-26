@@ -192,6 +192,14 @@ export const getVideoByShareId = async (req, res) => {
       video.viewerSessions = new Map();
     }
 
+    // Ensure uniqueViewers is an array
+    if (!Array.isArray(video.uniqueViewers)) {
+      video.uniqueViewers = [];
+    }
+
+    // Remove any duplicate viewer IDs (cleanup for existing data)
+    video.uniqueViewers = [...new Set(video.uniqueViewers)];
+
     const now = new Date();
     const sessionKey = viewerId || 'anonymous';
     const lastViewTime = video.viewerSessions.get(sessionKey);
@@ -211,6 +219,9 @@ export const getVideoByShareId = async (req, res) => {
       // Track unique viewers (only add if not already in array)
       if (viewerId && !video.uniqueViewers.includes(viewerId)) {
         video.uniqueViewers.push(viewerId);
+        console.log(`Added new unique viewer: ${viewerId} to video: ${video.title}`);
+      } else if (viewerId && video.uniqueViewers.includes(viewerId)) {
+        console.log(`Viewer ${viewerId} already exists in uniqueViewers for video: ${video.title}`);
       }
 
       // Update last viewed
