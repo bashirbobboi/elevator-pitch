@@ -8,6 +8,7 @@ const RecruiterView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   // Close modal on Escape key
   useEffect(() => {
@@ -149,7 +150,7 @@ const RecruiterView = () => {
               <div className="flex items-center gap-3 mb-6">
                 <div className="bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
                   <span>💼</span>
-                  <span className="text-sm font-medium">{profile?.firstName} {profile?.lastName} - Software Developer</span>
+                  <span className="text-sm font-medium">{video?.title || `${profile?.firstName} ${profile?.lastName} - Software Developer`}</span>
                 </div>
               </div>
             </div>
@@ -157,7 +158,10 @@ const RecruiterView = () => {
             {/* Action Buttons */}
             <div className="flex flex-col gap-4 mb-6 w-full max-w-[80%]">
               <button 
-                onClick={() => setShowVideoModal(true)}
+                onClick={() => {
+                  setVideoError(false);
+                  setShowVideoModal(true);
+                }}
                 className="bg-green-400 hover:bg-green-500 text-black px-6 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-colors w-full"
               >
                 <span>▶</span>
@@ -248,14 +252,21 @@ const RecruiterView = () => {
 
             {/* Video Player */}
             <div className="w-full">
-              {video.videoUrl && (
+              {video.videoUrl && !videoError && (
                 <video
                   controls
                   autoPlay
                   className="w-full h-auto max-h-[70vh] bg-black rounded-lg"
+                  onLoadStart={() => setVideoError(false)}
+                  onCanPlay={() => setVideoError(false)}
                   onError={(e) => {
                     console.error('Video playback error:', e);
-                    alert('Unable to play video. The video format may not be supported.');
+                    // Only set error after a delay to allow other sources to try
+                    setTimeout(() => {
+                      if (e.target.error) {
+                        setVideoError(true);
+                      }
+                    }, 1000);
                   }}
                 >
                   <source src={`http://localhost:5001${video.videoUrl}`} type="video/mp4" />
@@ -264,6 +275,25 @@ const RecruiterView = () => {
                   Your browser does not support the video tag.
                 </video>
               )}
+              
+              {videoError && (
+                <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-4xl mb-4">🎥</div>
+                    <p className="text-gray-600 mb-2">Unable to play video</p>
+                    <p className="text-sm text-gray-500">The video format may not be supported by your browser.</p>
+                    <button
+                      onClick={() => {
+                        setVideoError(false);
+                        // Try to reload the video
+                      }}
+                      className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Try Again
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Video Info */}
@@ -271,11 +301,7 @@ const RecruiterView = () => {
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 {video.title}
               </h3>
-              <div className="flex justify-center gap-4 text-sm text-gray-600">
-                <span>Views: {video.viewCount}</span>
-                <span>•</span>
-                <span>Unique Viewers: {video.uniqueViewers?.length || 0}</span>
-              </div>
+              
             </div>
 
             {/* Close Button */}
