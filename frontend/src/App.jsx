@@ -1571,3 +1571,4 @@ function App() {
 }
 
 export default App
+// Test comment to verify Vercel auto-deployment - Sat Sep 27 2025
