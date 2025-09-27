@@ -60,14 +60,14 @@ export function SocialLinks({ socials, className = "", ...props }) {
                   key={social.name}
                   src={social.image}
                   alt={social.name}
-                  className="w-16 h-16 rounded-lg shadow-lg"
+                  className="w-10 h-10"
                   initial={{
-                    y: -40,
+                    y: -35,
                     rotate: rotation,
                     opacity: 0,
                     filter: "blur(2px)",
                   }}
-                  animate={{ y: -50, opacity: 1, filter: "blur(0px)" }}
+                  animate={{ y: -45, opacity: 1, filter: "blur(0px)" }}
                   exit={{ y: -40, opacity: 0, filter: "blur(2px)" }}
                   transition={{ duration: 0.2 }}
                 />

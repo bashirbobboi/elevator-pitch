@@ -1,26 +1,36 @@
 import React from 'react';
 import { SocialLinks } from './social-links';
+import linkedInLogo from '../../assets/linkedIN.png';
+import githubLogo from '../../assets/github.png';
+import portfolioLogo from '../../assets/portfolio.png';
+import emailLogo from '../../assets/email.png';
+import twitterLogo from '../../assets/twitter.png';
 
 const socials = [
     {
         name: "LinkedIn",
-        image: "https://img.icons8.com/?size=100&id=MR3dZdlA53te&format=png&color=000000",
+        image: linkedInLogo,
         href: "https://linkedin.com/in/mohammed-bobboi"
     },
     {
         name: "GitHub",
-        image: "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=64&h=64&fit=crop&crop=center",
-        href: "https://github.com/mohammed-bobboi"
+        image: githubLogo,
+        href: "https://github.com/bashirbobboi"
+    },
+    {
+        name: "Twitter",
+        image: twitterLogo,
+        href: "https://x.com/bashirbobboi?s=21"
     },
     {
         name: "Portfolio",
-        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=64&h=64&fit=crop&crop=center",
-        href: "#"
+        image: portfolioLogo,
+        href: "http://bashirbobboi.github.io/netflix_portfolio/#/browse"
     },
     {
         name: "Email",
-        image: "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=64&h=64&fit=crop&crop=center",
-        href: "mailto:mohammed.bobboi@example.com"
+        image: emailLogo,
+        href: "mailto:bashirbobboi@gmail.com"
     }
 ];
 
@@ -29,7 +39,6 @@ export default function FooterSection() {
         <footer className="bg-gray-100 py-16">
             <div className="mx-auto max-w-5xl px-6">
                 <a
-                    href="/"
                     aria-label="go home"
                     className="mx-auto block w-fit">
                     <div className="text-2xl font-bold text-gray-800">
