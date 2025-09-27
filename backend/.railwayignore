@@ -1,0 +1,7 @@
+# Ignore everything except backend files
+../frontend/
+../node_modules/
+../.git/
+../README.md
+../package.json
+../package-lock.json

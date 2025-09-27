@@ -2,7 +2,10 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "npm start"
+startCommand = "cd backend && npm start"
 healthcheckPath = "/api/test"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
+
+[build.buildCommand]
+value = "cd backend && npm install"
