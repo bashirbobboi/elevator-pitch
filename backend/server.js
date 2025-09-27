@@ -7,9 +7,22 @@ import profileRoutes from "./routes/profileRoutes.js";
 
 
 dotenv.config();
-connectDB(); // <--- connect to MongoDB
 
 const app = express();
+
+// Connect to MongoDB with error handling
+const initializeDatabase = async () => {
+  try {
+    await connectDB();
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('MongoDB connection failed:', error);
+    // Continue without MongoDB for healthcheck to work
+  }
+};
+
+// Initialize database connection
+initializeDatabase();
 
 // CORS middleware
 app.use(cors({
@@ -34,9 +47,15 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Serve static files from uploads directory
 app.use("/uploads", express.static("uploads"));
 
-// test route
+// test route for healthcheck
 app.get("/api/test", (req, res) => {
-  res.send("API is running...");
+  res.json({
+    status: "OK",
+    message: "API is running",
+    timestamp: new Date().toISOString(),
+    port: process.env.PORT || 5001,
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 // Video routes
@@ -46,9 +65,31 @@ app.use("/api/videos", videoRoutes);
 app.use("/api/profile", profileRoutes);
 
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Start server with error handling
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Healthcheck available at: /api/test`);
+});
+
+// Handle server startup errors
+server.on('error', (err) => {
+  console.error('Server failed to start:', err);
+  process.exit(1);
+});
 
 
 
