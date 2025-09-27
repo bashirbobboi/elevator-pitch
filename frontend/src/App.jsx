@@ -583,7 +583,181 @@ function App() {
       )}
 
       {/* Conditional rendering based on active page - only show if authenticated */}
-      {isAuthenticated && activePage === 'view-pitch' ? (
+      {isAuthenticated && activePage === 'profile' ? (
+        <div className="profile-page" style={{ 
+          height: '100vh', 
+          display: 'flex', 
+          flexDirection: 'column',
+          backgroundColor: '#f8f9fa',
+          overflow: 'hidden'
+        }}>
+          {/* Header Section */}
+          <div style={{
+            backgroundColor: '#453431',
+            padding: '1.5rem 2rem',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <button 
+                onClick={() => setActivePage('dashboard')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontSize: '16px',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '6px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+                onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+              >
+                ← Back to Dashboard
+              </button>
+            </div>
+            <div style={{ textAlign: 'center', flex: 1 }}>
+              <h1 style={{ 
+                fontSize: '2rem', 
+                fontWeight: '600', 
+                margin: 0,
+                letterSpacing: '1px'
+              }}>
+                Profile Settings
+              </h1>
+            </div>
+            <div style={{ width: '200px' }}></div>
+          </div>
+          
+          {/* Profile Content */}
+          <div style={{
+            flex: 1,
+            padding: '2rem',
+            overflow: 'auto',
+            display: 'flex',
+            justifyContent: 'center'
+          }}>
+            <div style={{ 
+              width: '100%', 
+              maxWidth: '1200px',
+              display: 'flex', 
+              gap: '2rem', 
+              alignItems: 'flex-start'
+            }}>
+              {/* Profile Form */}
+              <div style={{ flex: '0 0 400px' }}>
+                {profileLoading ? (
+                  <div style={{ 
+                    padding: '2rem', 
+                    textAlign: 'center',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    border: '1px solid #e5e7eb'
+                  }}>
+                    <p>Loading profile...</p>
+                  </div>
+                ) : (
+                  <ProfileForm 
+                    profile={profile}
+                    onSaveProfile={saveProfile}
+                    onUpdateProfile={updateProfile}
+                  />
+                )}
+              </div>
+              
+              {/* Profile Picture Section */}
+              <div style={{ flex: 1 }}>
+                <div className="profile-picture-section" style={{ 
+                  width: '100%',
+                  padding: '2rem',
+                  backgroundColor: 'white',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  border: '1px solid #e5e7eb',
+                  height: 'fit-content'
+                }}>
+                  <h3 style={{ 
+                    fontSize: '20px', 
+                    fontWeight: '600', 
+                    marginBottom: '1.5rem',
+                    color: '#1f2937'
+                  }}>
+                    Profile Picture
+                  </h3>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '1.5rem'
+                  }}>
+                    {profileLoading ? (
+                      <div style={{
+                        width: '200px',
+                        height: '200px',
+                        borderRadius: '50%',
+                        backgroundColor: '#f3f4f6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        <p style={{ fontSize: '12px', color: '#6b7280' }}>Loading...</p>
+                      </div>
+                    ) : (
+                      <div style={{
+                        width: '200px',
+                        height: '200px',
+                        borderRadius: '50%',
+                        backgroundColor: '#f3f4f6',
+                        border: '3px dashed #d1d5db',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        overflow: 'hidden'
+                      }}>
+                        {profile?.profilePicture ? (
+                          <img 
+                            src={getImageUrl(profile.profilePicture)}
+                            alt="Profile"
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              borderRadius: '50%'
+                            }}
+                          />
+                        ) : (
+                          <UserCircle size={48} color="#9ca3af" />
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* File Upload Section */}
+                    <div style={{ width: '100%', maxWidth: '400px' }}>
+                      <FileInput
+                        onChange={uploadProfilePicture}
+                        accept="image/*"
+                        maxFileSize={5 * 1024 * 1024} // 5MB
+                        placeholder="Click to upload or drag and drop"
+                        description="PNG, JPG, GIF up to 5MB"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : isAuthenticated && activePage === 'view-pitch' ? (
         <div className="view-pitch-container" style={{ 
           height: '100vh', 
           display: 'flex', 
@@ -1023,7 +1197,7 @@ function App() {
             </div>
           </div>
         </div>
-      ) : activePage === 'profile' ? (
+      ) : (
         <div className="profile-container" style={{ padding: '1rem', height: 'calc(100vh - 120px)', overflow: 'hidden' }}>
           <h2 className='text-black' style={{ fontSize: '24px', fontWeight: '600', marginBottom: '1rem' }}>Profile</h2>
           <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', justifyContent: 'flex-start', height: 'calc(100% - 60px)' }}>
