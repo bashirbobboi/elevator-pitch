@@ -25,7 +25,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api
 const API_SERVER = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5001'
 
 // Helper function to get the correct image URL (handles both local and Cloudinary URLs)
-const getImageUrl = (imagePath) => {
+const getImageUrl = (imagePath, forceRefresh = false) => {
   if (!imagePath) {
     console.log('getImageUrl: No image path provided');
     return null;
@@ -34,12 +34,22 @@ const getImageUrl = (imagePath) => {
   // If it's already a full URL (Cloudinary), use it as-is
   if (imagePath.startsWith('http')) {
     console.log('getImageUrl: Using Cloudinary URL:', imagePath);
+    // Add cache-busting parameter for force refresh
+    if (forceRefresh) {
+      const separator = imagePath.includes('?') ? '&' : '?';
+      return `${imagePath}${separator}t=${Date.now()}`;
+    }
     return imagePath;
   }
   
   // If it's a local path, prepend API_SERVER
   const fullUrl = `${API_SERVER}${imagePath}`;
   console.log('getImageUrl: Using local URL:', fullUrl);
+  // Add cache-busting parameter for force refresh
+  if (forceRefresh) {
+    const separator = fullUrl.includes('?') ? '&' : '?';
+    return `${fullUrl}${separator}t=${Date.now()}`;
+  }
   return fullUrl;
 }
 
@@ -233,6 +243,12 @@ function App() {
         console.log('Upload successful:', result);
         // Refresh the entire profile to get the updated picture URL
         await fetchProfile()
+        // Force re-render by adding a timestamp to trigger React update
+        setProfile(prevProfile => ({
+          ...prevProfile,
+          profilePicture: result.profilePicture,
+          _imageTimestamp: Date.now() // Add timestamp to force re-render
+        }))
         toasterRef.current?.show({
           title: 'Success',
           message: 'Profile picture uploaded successfully!',
@@ -477,8 +493,9 @@ function App() {
               }}>
                 {profile?.profilePicture ? (
                   <img 
-                    src={getImageUrl(profile.profilePicture)} 
+                    src={getImageUrl(profile.profilePicture, profile._imageTimestamp ? true : false)} 
                     alt="Profile" 
+                    key={profile._imageTimestamp || profile.profilePicture} // Force re-render with key
                     style={{ 
                       width: '100%', 
                       height: '100%', 
@@ -1188,8 +1205,9 @@ function App() {
                       }}>
                         {profile?.profilePicture ? (
                           <img 
-                            src={getImageUrl(profile.profilePicture)}
+                            src={getImageUrl(profile.profilePicture, profile._imageTimestamp ? true : false)}
                             alt="Profile"
+                            key={profile._imageTimestamp || profile.profilePicture} // Force re-render with key
                             style={{
                               width: '100%',
                               height: '100%',
