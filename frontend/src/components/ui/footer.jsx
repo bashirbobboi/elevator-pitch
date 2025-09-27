@@ -25,7 +25,7 @@ const socials = [
     {
         name: "Portfolio",
         image: portfolioLogo,
-        href: "http://bashirbobboi.github.io/netflix_portfolio/#/browse"
+        href: "https://bashirbobboi.github.io/netflix_portfolio/#/browse"
     },
     {
         name: "Email",

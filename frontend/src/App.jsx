@@ -1195,7 +1195,7 @@ function App() {
                 <button 
                   className='action-btn copy-btn'
                   onClick={() => {
-                    navigator.clipboard.writeText(`http://localhost:5173/api/videos/share/${video.shareId}`)
+                    navigator.clipboard.writeText(`${import.meta.env.VITE_FRONTEND_URL || 'https://elevator-pitch-rho.vercel.app'}/api/videos/share/${video.shareId}`)
                     toasterRef.current?.show({
                       title: 'Copied!',
                       message: 'Pitch link copied to clipboard',

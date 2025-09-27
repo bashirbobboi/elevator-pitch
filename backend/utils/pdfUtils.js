@@ -128,7 +128,7 @@ export async function createDownloadableResume(originalResumePath, shareId) {
     );
 
     // Create the elevator pitch URL (frontend URL, not API)
-    const pitchUrl = `http://localhost:5173/api/videos/share/${shareId}`;
+    const pitchUrl = `${process.env.FRONTEND_URL || 'https://elevator-pitch-rho.vercel.app'}/api/videos/share/${shareId}`;
 
     // Add button to PDF
     await addButtonToPdf(normalizedPath, downloadablePath, pitchUrl);
