@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
-    "build": "cd frontend && npm run build",
+    "build": "echo 'Backend deployment - no build step required'",
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "start": "cd backend && npm start"
   },

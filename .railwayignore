@@ -1,0 +1,9 @@
+# Ignore frontend directory - this is a backend-only deployment
+frontend/
+node_modules/
+.git/
+.vercel/
+*.log
+.env.local
+.env.development
+.DS_Store
