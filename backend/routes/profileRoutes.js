@@ -75,8 +75,16 @@ router.post('/debug/consolidate', async (req, res) => {
   }
 });
 
-// Profile picture upload route
-router.post('/upload-picture', profileUpload.single('profilePicture'), uploadProfilePicture);
+// Profile picture upload route with error handling
+router.post('/upload-picture', (req, res, next) => {
+  profileUpload.single('profilePicture')(req, res, (err) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ error: err.message });
+    }
+    next();
+  });
+}, uploadProfilePicture);
 
 // Resume upload route
 router.post('/upload-resume', (req, res, next) => {

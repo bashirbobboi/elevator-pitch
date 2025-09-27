@@ -112,11 +112,13 @@ export const uploadProfilePicture = async (req, res) => {
   try {
     console.log('Upload request received:', {
       hasFile: !!req.file,
+      useCloudinary: process.env.NODE_ENV === 'production' || process.env.USE_CLOUDINARY === 'true',
       fileInfo: req.file ? {
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
         size: req.file.size,
-        filename: req.file.filename
+        filename: req.file.filename,
+        path: req.file.path
       } : null
     });
 
@@ -134,8 +136,8 @@ export const uploadProfilePicture = async (req, res) => {
 
     console.log('Found profile:', profile._id);
 
-    // Delete old profile picture if it exists
-    if (profile.profilePicture) {
+    // Delete old profile picture if it exists and is a local file
+    if (profile.profilePicture && !profile.profilePicture.startsWith('http')) {
       const oldImagePath = path.join(process.cwd(), profile.profilePicture);
       if (await fileExists(oldImagePath)) {
         await deleteFile(oldImagePath);
@@ -143,7 +145,7 @@ export const uploadProfilePicture = async (req, res) => {
       }
     }
 
-    // Update profile with new picture path (handle both local and Cloudinary)
+    // Update profile with new picture path (Cloudinary URL or local path)
     profile.profilePicture = req.file.path || `/uploads/profiles/${req.file.filename}`;
     await profile.save();
 
@@ -155,7 +157,7 @@ export const uploadProfilePicture = async (req, res) => {
     });
   } catch (error) {
     console.error('Error uploading profile picture:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message || 'Failed to upload profile picture' });
   }
 };
 

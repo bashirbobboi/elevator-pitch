@@ -232,16 +232,25 @@ function App() {
         })
         return { success: true, data: result }
       } else {
-        const error = await response.json()
-        console.error('Upload failed:', error);
+        let errorMessage = 'Failed to upload profile picture';
+        try {
+          const error = await response.json()
+          errorMessage = error.error || errorMessage;
+        } catch (jsonError) {
+          // If response is not JSON (e.g., HTML error page), use status text
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+          console.error('Non-JSON error response:', await response.text());
+        }
+        
+        console.error('Upload failed:', errorMessage);
         toasterRef.current?.show({
           title: 'Upload Failed',
-          message: error.error || 'Failed to upload profile picture',
+          message: errorMessage,
           variant: 'error',
           position: 'top-right',
           duration: 4000
         })
-        return { success: false, error: error.error }
+        return { success: false, error: errorMessage }
       }
     } catch (error) {
       console.error('Error uploading profile picture:', error)
