@@ -477,13 +477,19 @@ function App() {
               }}>
                 {profile?.profilePicture ? (
                   <img 
-                    src={`${API_SERVER}${profile.profilePicture}`} 
+                    src={getImageUrl(profile.profilePicture)} 
                     alt="Profile" 
                     style={{ 
                       width: '100%', 
                       height: '100%', 
                       objectFit: 'cover' 
                     }} 
+                    onError={(e) => {
+                      console.error('Header profile image failed to load:', {
+                        src: e.target.src,
+                        originalPath: profile.profilePicture
+                      });
+                    }}
                   />
                 ) : (
                   <User className="h-4 w-4 text-gray-500" />
@@ -776,13 +782,19 @@ function App() {
                     )}
                     
                     {/* File Upload Section */}
-                    <div style={{ width: '100%', maxWidth: '400px' }}>
+                    <div style={{ 
+                      width: '100%', 
+                      maxWidth: '400px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}>
                       <FileInput
                         onChange={uploadProfilePicture}
                         accept="image/*"
-                        maxFileSize={10 * 1024 * 1024} // 10MB
+                        maxFileSize={30 * 1024 * 1024} // 30MB
                         placeholder="Click to upload or drag and drop"
-                        description="PNG, JPG, GIF up to 10MB"
+                        description="All image formats up to 30MB"
                       />
                     </div>
                   </div>
