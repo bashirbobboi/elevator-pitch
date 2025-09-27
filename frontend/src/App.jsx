@@ -35,6 +35,8 @@ function App() {
   const [activeDropdown, setActiveDropdown] = useState(null) // Track which video's dropdown is open
   const [viewingVideo, setViewingVideo] = useState(null)
   const [showElevatorPitchForm, setShowElevatorPitchForm] = useState(false)
+  const [selectedVideoAnalytics, setSelectedVideoAnalytics] = useState(null)
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false)
   const toasterRef = useRef(null)
 
   // Check if we're on a recruiter route
@@ -269,6 +271,28 @@ function App() {
       });
     }
   }
+
+  const fetchVideoAnalytics = async (videoId) => {
+    try {
+      const response = await fetch(`http://localhost:5001/api/videos/${videoId}/stats`);
+      if (response.ok) {
+        const analyticsData = await response.json();
+        setSelectedVideoAnalytics(analyticsData);
+        setShowAnalyticsModal(true);
+      } else {
+        throw new Error('Failed to fetch analytics');
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+      toasterRef.current?.show({
+        title: 'Error',
+        message: 'Failed to load analytics data',
+        variant: 'error',
+        position: 'top-right',
+        duration: 3000
+      });
+    }
+  };
 
   // Sidebar navigation links
   const sidebarLinks = [
@@ -1102,7 +1126,10 @@ function App() {
                 >
                       <img src={copyIcon} alt="Copy" className="w-10 h-6" />
                     </button>
-                    <button className='action-btn insights-btn'>
+                    <button 
+                      className='action-btn insights-btn'
+                      onClick={() => fetchVideoAnalytics(video._id)}
+                    >
                       View Insights
                     </button>
                     <button 
@@ -1180,6 +1207,174 @@ function App() {
           onUpdateProfile={updateProfile}
           onPitchCreated={fetchVideos}
         />
+      )}
+
+      {/* Analytics Modal */}
+      {showAnalyticsModal && selectedVideoAnalytics && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Analytics: {selectedVideoAnalytics.title}
+              </h2>
+              <button
+                onClick={() => setShowAnalyticsModal(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              {/* Overview Stats */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-blue-600 mb-1">Total Views</h3>
+                <p className="text-2xl font-bold text-blue-900">{selectedVideoAnalytics.viewCount}</p>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-green-600 mb-1">Unique Viewers</h3>
+                <p className="text-2xl font-bold text-green-900">{selectedVideoAnalytics.uniqueViewers}</p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-purple-600 mb-1">Completion Rate</h3>
+                <p className="text-2xl font-bold text-purple-900">{selectedVideoAnalytics.completionRate.toFixed(1)}%</p>
+              </div>
+              <div className="bg-orange-50 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-orange-600 mb-1">Avg Watch Time</h3>
+                <p className="text-2xl font-bold text-orange-900">{selectedVideoAnalytics.avgWatchTime}s</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {/* Engagement Stats */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-600 mb-2">Resume Downloads</h3>
+                <p className="text-xl font-bold text-gray-900">{selectedVideoAnalytics.totalResumeDownloads}</p>
+                <p className="text-sm text-gray-500">{selectedVideoAnalytics.resumeDownloadRate}% of viewers</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-600 mb-2">Portfolio Clicks</h3>
+                <p className="text-xl font-bold text-gray-900">{selectedVideoAnalytics.totalPortfolioClicks}</p>
+                <p className="text-sm text-gray-500">{selectedVideoAnalytics.portfolioClickRate}% of viewers</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-600 mb-2">LinkedIn Clicks</h3>
+                <p className="text-xl font-bold text-gray-900">{selectedVideoAnalytics.totalLinkedinClicks}</p>
+                <p className="text-sm text-gray-500">{selectedVideoAnalytics.linkedinClickRate}% of viewers</p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Timeline</h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">First Viewed</p>
+                    <p className="font-medium">
+                      {selectedVideoAnalytics.firstViewed 
+                        ? new Date(selectedVideoAnalytics.firstViewed).toLocaleString()
+                        : 'Not yet viewed'
+                      }
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Last Viewed</p>
+                    <p className="font-medium">
+                      {selectedVideoAnalytics.lastViewed 
+                        ? new Date(selectedVideoAnalytics.lastViewed).toLocaleString()
+                        : 'Not yet viewed'
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Viewer Analytics */}
+            {selectedVideoAnalytics.viewerAnalytics && selectedVideoAnalytics.viewerAnalytics.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Individual Viewer Details</h3>
+                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Viewer ID</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Watch Time</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Completed</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Resume</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Portfolio</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">LinkedIn</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Last View</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {selectedVideoAnalytics.viewerAnalytics.map((viewer, index) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="px-4 py-2 text-sm text-gray-900 font-mono">
+                              {viewer.viewerId.substring(0, 12)}...
+                            </td>
+                            <td className="px-4 py-2 text-sm text-gray-900">
+                              {viewer.watchTime}s
+                            </td>
+                            <td className="px-4 py-2 text-sm">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                viewer.completed 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {viewer.completed ? 'Yes' : 'No'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2 text-sm">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                viewer.resumeDownloaded 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {viewer.resumeDownloaded ? 'Downloaded' : 'No'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2 text-sm">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                viewer.portfolioClicked 
+                                  ? 'bg-purple-100 text-purple-800' 
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {viewer.portfolioClicked ? 'Clicked' : 'No'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2 text-sm">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                viewer.linkedinClicked 
+                                  ? 'bg-indigo-100 text-indigo-800' 
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {viewer.linkedinClicked ? 'Clicked' : 'No'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2 text-sm text-gray-500">
+                              {new Date(viewer.lastView).toLocaleDateString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowAnalyticsModal(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       </div>
     </div>

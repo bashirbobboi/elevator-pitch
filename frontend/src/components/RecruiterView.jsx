@@ -144,8 +144,11 @@ const RecruiterView = () => {
     return viewerId;
   };
 
-  const handleDownloadResume = () => {
+  const handleDownloadResume = async () => {
     if (profile?.resume) {
+      // Track resume download
+      await trackButtonClick('resume');
+      
       // Download original resume (without button) for recruiter view
       const link = document.createElement('a');
       link.href = `http://localhost:5001${profile.resume}`;
@@ -153,6 +156,59 @@ const RecruiterView = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    }
+  };
+
+  // Track button clicks with debouncing to prevent duplicates
+  const trackButtonClick = (() => {
+    const clickedButtons = new Set();
+    
+    return async (buttonType) => {
+      try {
+        const viewerId = localStorage.getItem('viewerId');
+        if (!viewerId || !shareId) return;
+
+        // Prevent duplicate tracking for the same button within a short time
+        const clickKey = `${buttonType}_${Date.now()}`;
+        const recentClickKey = `${buttonType}_recent`;
+        
+        if (clickedButtons.has(recentClickKey)) return;
+        
+        clickedButtons.add(recentClickKey);
+        
+        // Remove the debounce after 1 second to allow legitimate re-clicks
+        setTimeout(() => {
+          clickedButtons.delete(recentClickKey);
+        }, 1000);
+
+        await fetch(`http://localhost:5001/api/videos/share/${shareId}/track-click`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ viewerId, buttonType })
+        });
+      } catch (error) {
+        console.error('Error tracking button click:', error);
+      }
+    };
+  })();
+
+  // Track video watch progress
+  const trackWatchProgress = async (currentTime, duration) => {
+    try {
+      const viewerId = localStorage.getItem('viewerId');
+      if (!viewerId || !shareId) return;
+
+      await fetch(`http://localhost:5001/api/videos/share/${shareId}/track-progress`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ viewerId, currentTime, duration })
+      });
+    } catch (error) {
+      console.error('Error tracking watch progress:', error);
     }
   };
 
@@ -227,6 +283,9 @@ const RecruiterView = () => {
                     href={profile.portfolioUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackButtonClick('portfolio')}
+                    onMouseDown={() => trackButtonClick('portfolio')} // Captures right-clicks too
+                    onContextMenu={() => trackButtonClick('portfolio')} // Captures right-click context menu
                     className="text-white hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                     style={{
                       backgroundImage: 'linear-gradient(to right, #485563 0%, #29323c 51%, #485563 100%)',
@@ -254,6 +313,9 @@ const RecruiterView = () => {
                     href={profile.linkedInUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackButtonClick('linkedin')}
+                    onMouseDown={() => trackButtonClick('linkedin')} // Captures right-clicks too
+                    onContextMenu={() => trackButtonClick('linkedin')} // Captures right-click context menu
                     className="text-white hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
                     style={{
                       backgroundImage: 'linear-gradient(to right, #0072B1 0%, #005A8B 51%, #0072B1 100%)',
@@ -374,6 +436,23 @@ const RecruiterView = () => {
               style={{ width: '240px', height: '300px', objectFit: 'cover' }}
               onLoadStart={() => setVideoError(false)}
               onCanPlay={() => setVideoError(false)}
+              onTimeUpdate={(e) => {
+                const currentTime = e.target.currentTime;
+                const duration = e.target.duration;
+                if (duration && currentTime) {
+                  // Track progress every 5 seconds to avoid too many API calls
+                  if (Math.floor(currentTime) % 5 === 0) {
+                    trackWatchProgress(currentTime, duration);
+                  }
+                }
+              }}
+              onEnded={(e) => {
+                // Track completion when video ends
+                const duration = e.target.duration;
+                if (duration) {
+                  trackWatchProgress(duration, duration);
+                }
+              }}
               onError={(e) => {
                 console.error('Video playback error:', e);
                 setTimeout(() => {

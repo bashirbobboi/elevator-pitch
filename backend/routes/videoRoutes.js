@@ -11,6 +11,8 @@ import {
   updateVideo,
   getVideoFileInfo,
   downloadResumeWithButton,
+  trackWatchProgress,
+  trackButtonClick,
 } from "../controllers/videoController.js";
 import videoUpload from "../config/multer.js";
 
@@ -25,6 +27,8 @@ router.delete("/:id", deleteVideo);        // Admin: delete video
 router.get("/:id/file-info", getVideoFileInfo); // Admin: get file info
 router.post("/share/:shareId", getVideoByShareId); // Recruiter view + track
 router.get("/share/:shareId/resume", downloadResumeWithButton); // Download resume with button
+router.post("/share/:shareId/track-progress", trackWatchProgress); // Track video watch progress
+router.post("/share/:shareId/track-click", trackButtonClick); // Track button clicks
 router.get("/:id/stats", getVideoAnalytics);       // Admin: stats for one
 router.get("/admin/all-stats", getAllAnalytics);   // Admin: stats for all
 

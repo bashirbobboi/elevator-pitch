@@ -128,6 +128,118 @@ export const downloadResumeWithButton = async (req, res) => {
   }
 };
 
+// Track video watch progress
+export const trackWatchProgress = async (req, res) => {
+  try {
+    const { shareId } = req.params;
+    const { viewerId, currentTime, duration } = req.body;
+
+    if (!viewerId || currentTime === undefined) {
+      return res.status(400).json({ error: "viewerId and currentTime are required" });
+    }
+
+    const video = await Video.findOne({ shareId });
+    if (!video) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    // Find or create viewer analytics
+    let viewerAnalytic = video.viewerAnalytics.find(va => va.viewerId === viewerId);
+    if (!viewerAnalytic) {
+      viewerAnalytic = {
+        viewerId,
+        firstView: new Date(),
+        lastView: new Date(),
+        totalWatchTime: 0,
+        completedVideo: false,
+        resumeDownloaded: false,
+        portfolioClicked: false,
+        linkedinClicked: false
+      };
+      video.viewerAnalytics.push(viewerAnalytic);
+    }
+
+    // Update watch time (store the maximum time reached)
+    viewerAnalytic.totalWatchTime = Math.max(viewerAnalytic.totalWatchTime, currentTime);
+    viewerAnalytic.lastView = new Date();
+
+    // Check if video was completed (90% or more)
+    if (duration && currentTime >= (duration * 0.9)) {
+      viewerAnalytic.completedVideo = true;
+    }
+
+    // Update completion rate
+    const completedViewers = video.viewerAnalytics.filter(va => va.completedVideo).length;
+    const totalViewers = video.viewerAnalytics.length;
+    video.completionRate = totalViewers > 0 ? (completedViewers / totalViewers) * 100 : 0;
+
+    await video.save();
+    res.json({ success: true, watchTime: viewerAnalytic.totalWatchTime });
+  } catch (error) {
+    console.error('Error tracking watch progress:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Track button clicks (resume download, portfolio, linkedin)
+export const trackButtonClick = async (req, res) => {
+  try {
+    const { shareId } = req.params;
+    const { viewerId, buttonType } = req.body;
+
+    if (!viewerId || !buttonType) {
+      return res.status(400).json({ error: "viewerId and buttonType are required" });
+    }
+
+    const video = await Video.findOne({ shareId });
+    if (!video) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    // Find or create viewer analytics
+    let viewerAnalytic = video.viewerAnalytics.find(va => va.viewerId === viewerId);
+    if (!viewerAnalytic) {
+      viewerAnalytic = {
+        viewerId,
+        firstView: new Date(),
+        lastView: new Date(),
+        totalWatchTime: 0,
+        completedVideo: false,
+        resumeDownloaded: false,
+        portfolioClicked: false,
+        linkedinClicked: false
+      };
+      video.viewerAnalytics.push(viewerAnalytic);
+    }
+
+    // Track the specific button click
+    switch (buttonType) {
+      case 'resume':
+        viewerAnalytic.resumeDownloaded = true;
+        video.resumeDownloads = (video.resumeDownloads || 0) + 1;
+        break;
+      case 'portfolio':
+        viewerAnalytic.portfolioClicked = true;
+        video.portfolioClicks = (video.portfolioClicks || 0) + 1;
+        break;
+      case 'linkedin':
+        viewerAnalytic.linkedinClicked = true;
+        video.linkedinClicks = (video.linkedinClicks || 0) + 1;
+        break;
+      default:
+        return res.status(400).json({ error: "Invalid buttonType" });
+    }
+
+    viewerAnalytic.lastView = new Date();
+    await video.save();
+
+    res.json({ success: true, buttonType, totalClicks: video[`${buttonType}${buttonType === 'resume' ? 'Downloads' : 'Clicks'}`] });
+  } catch (error) {
+    console.error('Error tracking button click:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Get video by Mongo _id (admin use)
 export const getVideoById = async (req, res) => {
   try {
@@ -144,14 +256,46 @@ export const getVideoAnalytics = async (req, res) => {
     try {
       const video = await Video.findById(req.params.id);
       if (!video) return res.status(404).json({ error: "Video not found" });
+
+      // Calculate average watch time
+      const totalWatchTime = video.viewerAnalytics.reduce((sum, va) => sum + (va.totalWatchTime || 0), 0);
+      const avgWatchTime = video.viewerAnalytics.length > 0 ? totalWatchTime / video.viewerAnalytics.length : 0;
+
+      // Calculate engagement metrics
+      const completedViewers = video.viewerAnalytics.filter(va => va.completedVideo).length;
+      const resumeDownloadRate = video.viewerAnalytics.filter(va => va.resumeDownloaded).length;
+      const portfolioClickRate = video.viewerAnalytics.filter(va => va.portfolioClicked).length;
+      const linkedinClickRate = video.viewerAnalytics.filter(va => va.linkedinClicked).length;
   
       res.json({
         title: video.title,
         shareId: video.shareId,
         viewCount: video.viewCount,
         uniqueViewers: video.uniqueViewers.length,
+        firstViewed: video.firstViewed,
         lastViewed: video.lastViewed,
         createdAt: video.createdAt,
+        // Advanced Analytics
+        completionRate: video.completionRate || 0,
+        avgWatchTime: Math.round(avgWatchTime),
+        totalResumeDownloads: video.resumeDownloads || 0,
+        totalPortfolioClicks: video.portfolioClicks || 0,
+        totalLinkedinClicks: video.linkedinClicks || 0,
+        // Engagement Rates (percentage of viewers who performed action)
+        resumeDownloadRate: video.uniqueViewers.length > 0 ? Math.round((resumeDownloadRate / video.uniqueViewers.length) * 100) : 0,
+        portfolioClickRate: video.uniqueViewers.length > 0 ? Math.round((portfolioClickRate / video.uniqueViewers.length) * 100) : 0,
+        linkedinClickRate: video.uniqueViewers.length > 0 ? Math.round((linkedinClickRate / video.uniqueViewers.length) * 100) : 0,
+        // Detailed viewer analytics
+        viewerAnalytics: video.viewerAnalytics.map(va => ({
+          viewerId: va.viewerId,
+          firstView: va.firstView,
+          lastView: va.lastView,
+          watchTime: va.totalWatchTime || 0,
+          completed: va.completedVideo || false,
+          resumeDownloaded: va.resumeDownloaded || false,
+          portfolioClicked: va.portfolioClicked || false,
+          linkedinClicked: va.linkedinClicked || false
+        }))
       });
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -220,12 +364,37 @@ export const getVideoByShareId = async (req, res) => {
       if (viewerId && !video.uniqueViewers.includes(viewerId)) {
         video.uniqueViewers.push(viewerId);
         console.log(`Added new unique viewer: ${viewerId} to video: ${video.title}`);
+        
+        // Set first viewed timestamp if this is the first viewer
+        if (!video.firstViewed) {
+          video.firstViewed = now;
+        }
       } else if (viewerId && video.uniqueViewers.includes(viewerId)) {
         console.log(`Viewer ${viewerId} already exists in uniqueViewers for video: ${video.title}`);
       }
 
       // Update last viewed
       video.lastViewed = now;
+
+      // Initialize or update viewer analytics
+      if (viewerId) {
+        let viewerAnalytic = video.viewerAnalytics.find(va => va.viewerId === viewerId);
+        if (!viewerAnalytic) {
+          viewerAnalytic = {
+            viewerId,
+            firstView: now,
+            lastView: now,
+            totalWatchTime: 0,
+            completedVideo: false,
+            resumeDownloaded: false,
+            portfolioClicked: false,
+            linkedinClicked: false
+          };
+          video.viewerAnalytics.push(viewerAnalytic);
+        } else {
+          viewerAnalytic.lastView = now;
+        }
+      }
 
       await video.save();
     }
