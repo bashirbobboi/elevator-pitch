@@ -532,7 +532,7 @@ Thank you for considering contributing to the Elevator Pitch Platform! Your cont
 
 **Questions?** Open an issue or start a discussion!
 
-[![GitHub Issues](https://img.shields.io/github/issues/yourusername/elevator-pitch)](https://github.com/yourusername/elevator-pitch/issues)
-[![GitHub Discussions](https://img.shields.io/github/discussions/yourusername/elevator-pitch)](https://github.com/yourusername/elevator-pitch/discussions)
+[![GitHub Issues](https://img.shields.io/github/issues/bashirbobboi/elevator-pitch)](https://github.com/bashirbobboi/elevator-pitch/issues)
+[![GitHub Discussions](https://img.shields.io/github/discussions/bashirbobboi/elevator-pitch)](https://github.com/bashirbobboi/elevator-pitch/discussions)
 
 </div>

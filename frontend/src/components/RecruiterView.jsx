@@ -36,12 +36,21 @@ const RecruiterView = () => {
 
     if (showVideoModal) {
       document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+      // Only prevent scrolling on mobile (full-screen modal)
+      // Allow scrolling on desktop where video is draggable
+      const isMobile = window.innerWidth < 640; // sm breakpoint
+      if (isMobile) {
+        document.body.style.overflow = 'hidden';
+      }
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      // Restore scrolling when video modal is closed (only if it was disabled)
+      const isMobile = window.innerWidth < 640;
+      if (isMobile) {
+        document.body.style.overflow = 'unset';
+      }
     };
   }, [showVideoModal]);
 
@@ -94,6 +103,12 @@ const RecruiterView = () => {
         if (!viewerId) {
           viewerId = generateViewerId();
         }
+        
+        // Add a small delay to prevent rapid duplicate requests in StrictMode
+        // This helps ensure localStorage is properly set before making the request
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        if (isCancelled) return;
         
         // Fetch video data
         const videoResponse = await fetch(`http://localhost:5001/api/videos/share/${shareId}`, {

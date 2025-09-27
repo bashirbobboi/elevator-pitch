@@ -351,7 +351,10 @@ export const getVideoByShareId = async (req, res) => {
     // Only count as new view if:
     // 1. No previous view from this viewer, OR
     // 2. Last view was more than 30 seconds ago (prevents rapid refresh spam)
-    const shouldCountView = !lastViewTime || (now - new Date(lastViewTime)) > 30000;
+    // 3. Additional protection: in development, require at least 5 seconds between views to handle React StrictMode
+    const timeSinceLastView = lastViewTime ? (now - new Date(lastViewTime)) : Infinity;
+    const minInterval = process.env.NODE_ENV === 'development' ? 5000 : 30000; // 5s in dev, 30s in prod
+    const shouldCountView = !lastViewTime || timeSinceLastView > minInterval;
 
     if (shouldCountView) {
       // Increment total views
