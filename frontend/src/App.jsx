@@ -900,7 +900,7 @@ function App() {
                       <span>|</span>
                       <span> {profile?.email || 'email@example.com'}</span>
                       <span>|</span>
-                      <span>🌐 {profile?.portfolioUrl || 'portfolio.com'}</span>
+                      <span> {profile?.portfolioUrl || 'portfolio.com'}</span>
                       <span>|</span>
                       <span>💼 {profile?.linkedInUrl || 'linkedin.com/in/profile'}</span>
                     </div>
