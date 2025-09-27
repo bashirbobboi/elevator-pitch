@@ -943,7 +943,7 @@ function App() {
                             margin: 0,
                             color: '#6b7280'
                           }}>
-                            Upper Second Class Degree. Modules: Java Programming, Software Development for Mobile Devices, Internet of Things, Machine Learning and AI, Devices and Networks.
+                             First Class Degree. Modules: Java Programming, Software Development for Mobile Devices, Internet of Things, Machine Learning and AI, Devices and Networks.
                           </p>
                         </div>
                         <div style={{ textAlign: 'right', fontSize: '0.9rem', color: '#6b7280' }}>
