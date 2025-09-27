@@ -1,0 +1,31 @@
+{
+  "name": "elevator-pitch",
+  "version": "1.0.0",
+  "description": "Full-stack elevator pitch application",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "echo 'Backend deployment - no build step required'",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "start": "cd backend && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "dependencies": {
+    "framer-motion": "^12.23.16",
+    "lucide-react": "^0.544.0",
+    "mongodb": "^6.20.0",
+    "nanoid": "^5.1.5",
+    "react-icons": "^5.5.0",
+    "slugify": "^1.6.6",
+    "tailwindcss": "^4.1.13",
+    "uuid": "^13.0.0"
+  }
+}

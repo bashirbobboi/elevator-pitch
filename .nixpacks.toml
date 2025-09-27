@@ -5,26 +5,10 @@ NODE_ENV = 'production'
 nixPkgs = ['nodejs-20_x']
 
 [phases.install]
-cmds = [
-  'echo "=== Starting installation ==="',
-  'pwd',
-  'ls -la',
-  'echo "=== Checking backend directory ==="',
-  'cd backend',
-  'pwd',
-  'ls -la',
-  'echo "=== Reading package.json ==="',
-  'cat package.json',
-  'echo "=== Installing dependencies ==="',
-  'npm install --production --no-optional --force',
-  'echo "=== Verifying installation ==="',
-  'ls -la node_modules',
-  'ls -la node_modules/express',
-  'echo "=== Dependencies installed successfully ==="'
-]
+cmds = ['npm install --production']
 
 [phases.build]
 cmds = ['echo "No build step required for Node.js backend"']
 
 [start]
-cmd = 'cd backend && npm start'
+cmd = 'npm start'
