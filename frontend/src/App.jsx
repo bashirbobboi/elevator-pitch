@@ -896,7 +896,7 @@ function App() {
                       gap: '1rem',
                       flexWrap: 'wrap'
                     }}>
-                      <span>📞 {profile?.phone || '+1 (555) 123-4567'}</span>
+                      <span> {profile?.phone || '+1 (555) 123-4567'}</span>
                       <span>|</span>
                       <span> {profile?.email || 'email@example.com'}</span>
                       <span>|</span>
