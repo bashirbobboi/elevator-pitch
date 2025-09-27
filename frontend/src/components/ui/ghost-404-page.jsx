@@ -167,7 +167,7 @@ export function NotFound() {
             className="text-lg md:text-xl text-[#222222] mb-8 md:mb-12 opacity-50 select-none"
             variants={itemVariants}
           >
-            Whoops! This elevator pitch must have been taken down!
+            Try refreshing the page just in case.
           </motion.p>
 
           <motion.div 

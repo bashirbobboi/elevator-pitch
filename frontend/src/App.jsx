@@ -19,6 +19,7 @@ import ElevatorPitchForm from './components/ui/elevator-pitch-form'
 import { ProfileForm } from './components/ui/profile-form'
 import Toaster from './components/ui/toast'
 import FooterSection from './components/ui/footer'
+import AuthModal from './components/ui/auth-modal'
 
 const API_BASE = 'http://localhost:5001/api'
 
@@ -38,10 +39,21 @@ function App() {
   const [showElevatorPitchForm, setShowElevatorPitchForm] = useState(false)
   const [selectedVideoAnalytics, setSelectedVideoAnalytics] = useState(null)
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
   const toasterRef = useRef(null)
 
   // Check if we're on a recruiter route
   const isRecruiterRoute = location.pathname.startsWith('/api/videos/share/')
+
+  // Show auth modal if not authenticated and trying to access dashboard
+  const showAuthIfNeeded = () => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return false;
+    }
+    return true;
+  };
 
   const fetchVideos = () => {
     fetch('http://localhost:5001/api/videos')
@@ -51,11 +63,37 @@ function App() {
   }
 
   useEffect(() => {
+    // Check for existing authentication
+    const authStatus = localStorage.getItem('isAuthenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    } else {
+      // Show auth modal immediately if not authenticated
+      setShowAuthModal(true);
+    }
+    
     fetchVideos()
     
     // Load admin profile on app start
     fetchProfile()
   }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem('isAuthenticated', 'true');
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('isAuthenticated');
+    toasterRef.current?.show({
+      title: 'Logged Out',
+      message: 'You have been logged out successfully',
+      variant: 'success',
+      position: 'top-right',
+      duration: 2000
+    });
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -485,14 +523,53 @@ function App() {
                     <UserCircle className="h-4 w-4" />
                     Profile
                   </button>
+                  {isAuthenticated && (
+                    <button
+                      onClick={() => {
+                        handleLogout()
+                        setDropdownOpen(false)
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        border: 'none',
+                        background: 'none',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        color: '#dc2626',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        transition: 'background-color 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Logout
+                    </button>
+                  )}
                 </div>
               )}
             </div>
           </div>
         </header>
       
-      {/* Conditional rendering based on active page */}
-      {activePage === 'view-pitch' ? (
+      {/* Show auth modal if not authenticated */}
+      {!isAuthenticated && (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Conditional rendering based on active page - only show if authenticated */}
+      {isAuthenticated && activePage === 'view-pitch' ? (
         <div className="view-pitch-container" style={{ 
           height: '100vh', 
           display: 'flex', 
@@ -1077,28 +1154,30 @@ function App() {
             </div>
           </div>
         </div>
-      ) : (
+      ) : null}
+
+      {/* Main Dashboard - only show if authenticated */}
+      {isAuthenticated && activePage !== 'view-pitch' && (
         <>
-      <div className='dashboard-container'>
+          <div className='dashboard-container'>
             <h2 className='text-black' style={{ fontSize: '30px', fontWeight: '600' }}>Dashboard</h2>
-        <div className='cards-grid'>
-          <Card>
+            <div className='cards-grid'>
+              <Card>
                 <h3>Total Pitches</h3>
                 <p>{videos.length}</p>
-          </Card>
+              </Card>
 
-          <Card>
+              <Card>
                 <h3>Total Views</h3>
                 <p>{totalViews}</p>
-          </Card>
+              </Card>
 
-          <Card>
+              <Card>
                 <h3>Most Viewed Pitch</h3>
                 <p>{mostViewedVideo.title}</p>
-
-          </Card>
-        </div>
-      </div>
+              </Card>
+            </div>
+          </div>
 
           <div className='videos-container'>
             <h2 className='text-black'>Videos</h2>
@@ -1198,10 +1277,11 @@ function App() {
             </div>
           </div>
 
-          {/* Footer */}
-          <FooterSection />
         </>
       )}
+
+      {/* Footer - always visible */}
+      <FooterSection />
       
       {/* Elevator Pitch Form Modal */}
       {showElevatorPitchForm && (
@@ -1380,6 +1460,15 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* Authentication Modal */}
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onLogin={handleLogin}
+      />
+
+      <Toaster ref={toasterRef} />
       </div>
     </div>
         } />

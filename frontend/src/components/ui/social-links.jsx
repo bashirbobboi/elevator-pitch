@@ -24,12 +24,12 @@ export function SocialLinks({ socials, className = "", ...props }) {
 
   return (
     <div
-      className={`flex items-center justify-center gap-0 ${className}`}
+      className={`flex flex-wrap items-center justify-center gap-0 ${className}`}
       {...props}
     >
       {socials.map((social, index) => (
         <div
-          className={`relative cursor-pointer px-5 py-2 transition-opacity duration-200 ${
+          className={`relative cursor-pointer px-2 sm:px-3 lg:px-5 py-1 sm:py-2 transition-opacity duration-200 ${
             hoveredSocial && hoveredSocial !== social.name
               ? "opacity-50"
               : "opacity-100"
@@ -47,7 +47,7 @@ export function SocialLinks({ socials, className = "", ...props }) {
             }
           }}
         >
-          <span className="block text-lg font-medium text-gray-700 hover:text-gray-900">
+          <span className="block text-sm sm:text-base lg:text-lg font-medium text-gray-700 hover:text-gray-900">
             {social.name}
           </span>
           <AnimatePresence>
