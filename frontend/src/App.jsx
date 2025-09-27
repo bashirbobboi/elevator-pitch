@@ -902,7 +902,7 @@ function App() {
                       <span>|</span>
                       <span> {profile?.portfolioUrl || 'portfolio.com'}</span>
                       <span>|</span>
-                      <span>💼 {profile?.linkedInUrl || 'linkedin.com/in/profile'}</span>
+                      <span> {profile?.linkedInUrl || 'linkedin.com/in/profile'}</span>
                     </div>
                   </div>
 
