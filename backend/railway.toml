@@ -6,3 +6,6 @@ startCommand = "npm start"
 healthcheckPath = "/api/test"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
+
+[environments.production.build]
+buildCommand = "npm install"
