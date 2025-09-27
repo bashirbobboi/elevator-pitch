@@ -929,7 +929,7 @@ function App() {
                             margin: '0 0 0.5rem 0',
                             color: '#1f2937'
                           }}>
-                            University of Sheff
+                            University of Sh
                           </h3>
                           <p style={{ 
                             fontSize: '1rem', 
