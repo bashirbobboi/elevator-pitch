@@ -146,10 +146,16 @@ export const uploadProfilePicture = async (req, res) => {
     }
 
     // Update profile with new picture path (Cloudinary URL or local path)
+    const oldPicture = profile.profilePicture;
     profile.profilePicture = req.file.path || `/uploads/profiles/${req.file.filename}`;
     await profile.save();
 
-    console.log('Profile picture saved successfully:', profile.profilePicture);
+    console.log('Profile picture updated:', {
+      oldPicture: oldPicture,
+      newPicture: profile.profilePicture,
+      profileId: profile._id,
+      updatedAt: profile.updatedAt
+    });
 
     res.json({
       message: 'Profile picture uploaded successfully',
