@@ -138,8 +138,8 @@ export const uploadProfilePicture = async (req, res) => {
       }
     }
 
-    // Update profile with new picture path
-    profile.profilePicture = `/uploads/profiles/${req.file.filename}`;
+    // Update profile with new picture path (handle both local and Cloudinary)
+    profile.profilePicture = req.file.path || `/uploads/profiles/${req.file.filename}`;
     await profile.save();
 
     console.log('Profile picture saved successfully:', profile.profilePicture);
@@ -183,8 +183,8 @@ export const uploadResume = async (req, res) => {
       }
     }
 
-    // Update profile with new resume path
-    profile.resume = `/uploads/resumes/${req.file.filename}`;
+    // Update profile with new resume path (handle both local and Cloudinary)
+    profile.resume = req.file.path || `/uploads/resumes/${req.file.filename}`;
     await profile.save();
 
     res.json({

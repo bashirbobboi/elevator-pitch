@@ -45,9 +45,12 @@ export const uploadVideo = async (req, res) => {
     const slug = slugify(title, { lower: true, strict: true });
     const shareId = `${slug}-${nanoid(6)}`;
 
+    // Handle both local and Cloudinary file paths
+    const videoUrl = req.file.path || `/uploads/${req.file.filename}`;
+    
     const video = new Video({
       title,
-      videoUrl: `/uploads/${req.file.filename}`, // Store relative path
+      videoUrl: videoUrl, // Store full URL for Cloudinary or relative path for local
       shareId,
     });
 

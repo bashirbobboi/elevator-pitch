@@ -13,9 +13,19 @@ const app = express();
 
 // CORS middleware
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:3000"], // Frontend URLs
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ["http://localhost:5173", "http://localhost:3000"],
   credentials: true
 }));
+
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    res.header('X-Content-Type-Options', 'nosniff');
+    res.header('X-Frame-Options', 'DENY');
+    res.header('X-XSS-Protection', '1; mode=block');
+    res.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    next();
+  });
+}
 
 // middleware to parse JSON
 app.use(express.json());

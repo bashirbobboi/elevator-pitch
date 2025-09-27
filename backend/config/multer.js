@@ -1,8 +1,12 @@
 import multer from "multer";
 import path from "path";
+import { videoStorage, resumeStorage, profileStorage } from './cloudinary.js';
+
+// Use Cloudinary storage for production, local storage for development
+const useCloudinary = process.env.NODE_ENV === 'production' || process.env.USE_CLOUDINARY === 'true';
 
 // Configure storage for videos
-const videoStorage = multer.diskStorage({
+const videoStorageConfig = useCloudinary ? videoStorage : multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/"); // save in uploads folder
   },
@@ -16,7 +20,7 @@ const videoStorage = multer.diskStorage({
 });
 
 // Configure storage for resumes
-const resumeStorage = multer.diskStorage({
+const resumeStorageConfig = useCloudinary ? resumeStorage : multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/resumes/"); // save in uploads/resumes folder
   },
@@ -26,6 +30,18 @@ const resumeStorage = multer.diskStorage({
     // Remove spaces and special characters from filename
     const cleanName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
     cb(null, uniqueSuffix + "-" + cleanName);
+  }
+});
+
+// Configure storage for profile pictures
+const profileStorageConfig = useCloudinary ? profileStorage : multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/profiles/");
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const cleanName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    cb(null, `profile-${uniqueSuffix}-${cleanName}`);
   }
 });
 
@@ -51,7 +67,7 @@ const resumeFileFilter = (req, file, cb) => {
 
 // Configure multer for videos
 const videoUpload = multer({ 
-  storage: videoStorage,
+  storage: videoStorageConfig,
   fileFilter: videoFileFilter,
   limits: {
     fileSize: 100 * 1024 * 1024 // 100MB limit
@@ -60,12 +76,28 @@ const videoUpload = multer({
 
 // Configure multer for resumes
 const resumeUpload = multer({ 
-  storage: resumeStorage,
+  storage: resumeStorageConfig,
   fileFilter: resumeFileFilter,
   limits: {
     fileSize: 10 * 1024 * 1024 // 10MB limit
   }
 });
 
+// Configure multer for profile pictures
+const profileUpload = multer({
+  storage: profileStorageConfig,
+  fileFilter: (req, file, cb) => {
+    // Accept only image files
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
 export default videoUpload;
-export { resumeUpload };
+export { resumeUpload, profileUpload };

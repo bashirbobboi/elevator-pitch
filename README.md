@@ -88,7 +88,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/elevator-pitch.git
+   git clone https://github.com/bashirbobboi/elevator-pitch.git
    cd elevator-pitch
    ```
 
@@ -236,7 +236,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Mohammed Bobboi** - [@bashirbobboi](https://twitter.com/bashirbobboi) - bashirbobboi@gmail.com
 
-**Project Link**: [https://github.com/yourusername/elevator-pitch](https://github.com/yourusername/elevator-pitch)
+**Project Link**: [https://github.com/bashirbobboi/elevator-pitch](https://github.com/bashirbobboi/elevator-pitch)
 
 ---
 
