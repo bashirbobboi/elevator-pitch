@@ -79,8 +79,32 @@ router.post('/debug/consolidate', async (req, res) => {
 router.post('/upload-picture', (req, res, next) => {
   profileUpload.single('profilePicture')(req, res, (err) => {
     if (err) {
-      console.error('Multer error:', err);
-      return res.status(400).json({ error: err.message });
+      console.error('Multer error:', {
+        message: err.message,
+        code: err.code,
+        field: err.field,
+        storageErrors: err.storageErrors
+      });
+      
+      // Provide more specific error messages
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ 
+          error: 'File too large. Maximum size is 30MB.',
+          details: err.message
+        });
+      }
+      
+      if (err.message.includes('Only image files')) {
+        return res.status(400).json({ 
+          error: 'Invalid file type. Please upload an image file (JPG, PNG, GIF, WebP).',
+          details: err.message
+        });
+      }
+      
+      return res.status(400).json({ 
+        error: err.message || 'File upload failed',
+        details: err.message
+      });
     }
     next();
   });

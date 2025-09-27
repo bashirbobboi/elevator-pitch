@@ -47,8 +47,8 @@ export const profileStorage = new CloudinaryStorage({
   params: {
     folder: 'elevator-pitch/profiles',
     resource_type: 'image',
-    allowed_formats: ['jpg', 'png', 'jpeg'],
-    transformation: [{ width: 500, height: 500, crop: 'limit', quality: 'auto' }],
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
+    transformation: [{ width: 500, height: 500, crop: 'limit', quality: 'auto', format: 'auto' }],
     public_id: (req, file) => {
       // Create unique filename with timestamp
       const timestamp = Date.now();

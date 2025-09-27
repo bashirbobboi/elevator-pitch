@@ -24,14 +24,29 @@ const validateFile = (
     const fileType = file.type;
     const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
 
+    // Check if it's an image/* wildcard
+    const hasImageWildcard = acceptedTypes.some(type => type === 'image/*');
+    
     const isValidType = acceptedTypes.some((acceptedType) => {
       if (acceptedType.startsWith('.')) {
         return acceptedType === fileExtension;
+      }
+      if (acceptedType === 'image/*') {
+        // For image/*, check if it's any image type OR has image extension
+        return fileType.startsWith('image/') || 
+               ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff', '.svg'].includes(fileExtension);
       }
       return acceptedType === fileType;
     });
 
     if (!isValidType) {
+      console.log('File validation failed:', {
+        fileName: file.name,
+        fileType: fileType,
+        fileExtension: fileExtension,
+        acceptedTypes: acceptedTypes,
+        hasImageWildcard: hasImageWildcard
+      });
       return { success: false, message: 'File type not accepted.' };
     }
   }

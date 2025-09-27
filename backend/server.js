@@ -27,8 +27,9 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// middleware to parse JSON
-app.use(express.json());
+// middleware to parse JSON with increased limit for large files
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Serve static files from uploads directory
 app.use("/uploads", express.static("uploads"));

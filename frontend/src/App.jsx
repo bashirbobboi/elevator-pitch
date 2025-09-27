@@ -1237,7 +1237,7 @@ function App() {
                     }}>
                       <FileInput
                         onChange={uploadProfilePicture}
-                        accept="image/*"
+                        accept="image/*,.jpg,.jpeg,.png,.gif,.webp,.bmp,.tiff"
                         maxFileSize={30 * 1024 * 1024} // 30MB
                         placeholder="Click to upload or drag and drop"
                         description="All image formats up to 30MB"
@@ -1248,9 +1248,6 @@ function App() {
               </div>
             </div>
           </div>
-          
-          {/* Footer */}
-          <FooterSection />
         </div>
       ) : (
         null
