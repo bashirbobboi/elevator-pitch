@@ -42,20 +42,33 @@ router.get('/debug/all', async (req, res) => {
   }
 });
 
-// Cleanup route to remove test profiles
-router.delete('/debug/cleanup', async (req, res) => {
+// Cleanup route to consolidate to single profile (single-user system)
+router.post('/debug/consolidate', async (req, res) => {
   try {
-    // Delete test profiles (keep only the main one with resume)
+    // Find the main profile (the one with resume and profile picture)
+    const mainProfile = await Profile.findOne({ 
+      email: 'bashirbobboi@gmail.com',
+      resume: { $ne: null }
+    });
+    
+    if (!mainProfile) {
+      return res.status(404).json({ error: 'Main profile not found' });
+    }
+
+    // Delete all other profiles
     const result = await Profile.deleteMany({
-      $or: [
-        { email: { $regex: /test|example|newdeploy/i } },
-        { email: 'bashirbobboi@gmail.comewf' } // Remove typo version
-      ]
+      _id: { $ne: mainProfile._id }
     });
     
     res.json({
-      message: `Cleaned up ${result.deletedCount} test profiles`,
-      deletedCount: result.deletedCount
+      message: `Consolidated to single profile. Removed ${result.deletedCount} duplicate profiles`,
+      deletedCount: result.deletedCount,
+      keptProfile: {
+        _id: mainProfile._id,
+        email: mainProfile.email,
+        firstName: mainProfile.firstName,
+        lastName: mainProfile.lastName
+      }
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

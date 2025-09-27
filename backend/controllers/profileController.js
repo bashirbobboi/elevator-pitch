@@ -2,18 +2,29 @@ import Profile from '../models/Profile.js';
 import { deleteFile, fileExists } from '../utils/fileUtils.js';
 import path from 'path';
 
-// Create a new profile
+// Create or update the single profile (since this is a single-user platform)
 export const createProfile = async (req, res) => {
   try {
     const { firstName, lastName, email, location, linkedInUrl, portfolioUrl } = req.body;
 
-    // Check if profile already exists
-    const existingProfile = await Profile.findOne({ email });
-    if (existingProfile) {
-      return res.status(400).json({ error: 'Profile with this email already exists' });
+    // Check if a profile already exists (single-user system)
+    let profile = await Profile.findOne();
+    
+    if (profile) {
+      // Update existing profile instead of creating new one
+      profile.firstName = firstName || profile.firstName;
+      profile.lastName = lastName || profile.lastName;
+      profile.email = email || profile.email;
+      profile.location = location || profile.location;
+      profile.linkedInUrl = linkedInUrl || profile.linkedInUrl;
+      profile.portfolioUrl = portfolioUrl || profile.portfolioUrl;
+      
+      await profile.save();
+      return res.json(profile);
     }
 
-    const profile = new Profile({
+    // Create first profile if none exists
+    profile = new Profile({
       firstName,
       lastName,
       email,
@@ -25,21 +36,15 @@ export const createProfile = async (req, res) => {
     await profile.save();
     res.status(201).json(profile);
   } catch (error) {
-    console.error('Error creating profile:', error);
+    console.error('Error creating/updating profile:', error);
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get profile (since we're not implementing login yet, we'll get the most complete profile)
+// Get the single profile (single-user system)
 export const getProfile = async (req, res) => {
   try {
-    // First try to get a profile with resume, then fall back to most recent
-    let profile = await Profile.findOne({ resume: { $ne: null } }).sort({ updatedAt: -1 });
-    
-    if (!profile) {
-      // If no profile with resume, get the most recent one
-      profile = await Profile.findOne().sort({ createdAt: -1 });
-    }
+    const profile = await Profile.findOne();
     
     if (!profile) {
       return res.status(404).json({ error: 'No profile found' });
@@ -51,26 +56,18 @@ export const getProfile = async (req, res) => {
   }
 };
 
-// Update profile
+// Update the single profile (single-user system)
 export const updateProfile = async (req, res) => {
   try {
     const { firstName, lastName, email, location, linkedInUrl, portfolioUrl } = req.body;
 
-    // Find the profile (since we're not implementing login yet, we'll update the first/only profile)
-    const profile = await Profile.findOne().sort({ createdAt: -1 });
+    // Get the single profile
+    const profile = await Profile.findOne();
     if (!profile) {
       return res.status(404).json({ error: 'No profile found' });
     }
 
-    // Check if email is being changed and if it conflicts with another profile
-    if (email && email !== profile.email) {
-      const existingProfile = await Profile.findOne({ email, _id: { $ne: profile._id } });
-      if (existingProfile) {
-        return res.status(400).json({ error: 'Profile with this email already exists' });
-      }
-    }
-
-    // Update fields
+    // Update fields (no email uniqueness check needed - single user system)
     profile.firstName = firstName || profile.firstName;
     profile.lastName = lastName || profile.lastName;
     profile.email = email || profile.email;
@@ -128,8 +125,8 @@ export const uploadProfilePicture = async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Find the profile
-    const profile = await Profile.findOne().sort({ createdAt: -1 });
+    // Find the single profile
+    const profile = await Profile.findOne();
     if (!profile) {
       console.log('No profile found');
       return res.status(404).json({ error: 'No profile found' });
