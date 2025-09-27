@@ -221,10 +221,8 @@ function App() {
       if (response.ok) {
         const result = await response.json()
         console.log('Upload successful:', result);
-        setProfile(prev => ({
-          ...prev,
-          profilePicture: result.profilePicture
-        }))
+        // Refresh the entire profile to get the updated picture URL
+        await fetchProfile()
         toasterRef.current?.show({
           title: 'Success',
           message: 'Profile picture uploaded successfully!',

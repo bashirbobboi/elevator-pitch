@@ -1,5 +1,6 @@
 import express from 'express';
 import multer from 'multer';
+import Profile from '../models/Profile.js';
 import {
   createProfile,
   getProfile,
@@ -46,6 +47,27 @@ router.post('/', createProfile);
 router.get('/', getProfile);
 router.put('/', updateProfile);
 router.delete('/', deleteProfile);
+
+// Debug route to see all profiles
+router.get('/debug/all', async (req, res) => {
+  try {
+    const profiles = await Profile.find({}).sort({ createdAt: -1 });
+    res.json({
+      count: profiles.length,
+      profiles: profiles.map(p => ({
+        _id: p._id,
+        email: p.email,
+        firstName: p.firstName,
+        lastName: p.lastName,
+        createdAt: p.createdAt,
+        hasProfilePicture: !!p.profilePicture,
+        hasResume: !!p.resume
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Profile picture upload route
 router.post('/upload-picture', (req, res, next) => {

@@ -62,6 +62,14 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ error: 'No profile found' });
     }
 
+    // Check if email is being changed and if it conflicts with another profile
+    if (email && email !== profile.email) {
+      const existingProfile = await Profile.findOne({ email, _id: { $ne: profile._id } });
+      if (existingProfile) {
+        return res.status(400).json({ error: 'Profile with this email already exists' });
+      }
+    }
+
     // Update fields
     profile.firstName = firstName || profile.firstName;
     profile.lastName = lastName || profile.lastName;
