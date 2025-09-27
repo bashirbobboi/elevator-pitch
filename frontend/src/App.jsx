@@ -21,7 +21,7 @@ import Toaster from './components/ui/toast'
 import FooterSection from './components/ui/footer'
 import AuthModal from './components/ui/auth-modal'
 
-const API_BASE = 'http://localhost:5001/api'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api'
 
 function App() {
   const location = useLocation();

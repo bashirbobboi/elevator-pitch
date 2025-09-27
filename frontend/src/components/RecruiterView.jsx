@@ -7,6 +7,9 @@ import playGif from '../assets/play.png';
 import workLogo from '../assets/work.png';
 import FooterSection from './ui/footer';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+const API_SERVER = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5001';
+
 const RecruiterView = () => {
   const { shareId } = useParams();
   const [video, setVideo] = useState(null);
@@ -111,7 +114,7 @@ const RecruiterView = () => {
         if (isCancelled) return;
         
         // Fetch video data
-        const videoResponse = await fetch(`http://localhost:5001/api/videos/share/${shareId}`, {
+        const videoResponse = await fetch(`${API_BASE}/videos/share/${shareId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -128,7 +131,7 @@ const RecruiterView = () => {
         if (!isCancelled) setVideo(videoData);
 
         // Fetch profile data
-        const profileResponse = await fetch('http://localhost:5001/api/profile');
+        const profileResponse = await fetch(`${API_BASE}/profile`);
         if (profileResponse.ok) {
           const profileData = await profileResponse.json();
           if (!isCancelled) setProfile(profileData);
@@ -174,7 +177,7 @@ const RecruiterView = () => {
       
       // Download original resume (without button) for recruiter view
       const link = document.createElement('a');
-      link.href = `http://localhost:5001${profile.resume}`;
+      link.href = `${API_SERVER}${profile.resume}`;
       link.download = `${profile.firstName}_${profile.lastName}_Resume.pdf`;
       document.body.appendChild(link);
       link.click();
@@ -204,7 +207,7 @@ const RecruiterView = () => {
           clickedButtons.delete(recentClickKey);
         }, 1000);
 
-        await fetch(`http://localhost:5001/api/videos/share/${shareId}/track-click`, {
+        await fetch(`${API_BASE}/videos/share/${shareId}/track-click`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -223,7 +226,7 @@ const RecruiterView = () => {
       const viewerId = localStorage.getItem('viewerId');
       if (!viewerId || !shareId) return;
 
-      await fetch(`http://localhost:5001/api/videos/share/${shareId}/track-progress`, {
+      await fetch(`${API_BASE}/videos/share/${shareId}/track-progress`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -275,7 +278,7 @@ const RecruiterView = () => {
                 >
                   {profile?.profilePicture ? (
                     <img 
-                      src={`http://localhost:5001${profile.profilePicture}`}
+                      src={`${API_SERVER}${profile.profilePicture}`}
                       alt={`${profile.firstName} ${profile.lastName}`}
                       className="w-full h-full object-cover"
                     />
@@ -395,7 +398,7 @@ const RecruiterView = () => {
                 >
                   {profile?.profilePicture ? (
                     <img 
-                      src={`http://localhost:5001${profile.profilePicture}`}
+                      src={`${API_SERVER}${profile.profilePicture}`}
                       alt={`${profile.firstName} ${profile.lastName}`}
                       className="w-full h-full object-cover"
                     />
@@ -546,7 +549,7 @@ const RecruiterView = () => {
           {profile?.resume ? (
             <div className="w-full h-[80vh] sm:h-[100vh] lg:h-[130vh] border border-gray-300 rounded-lg overflow-hidden shadow-lg">
               <iframe
-                src={`http://localhost:5001${profile.resume}`}
+                src={`${API_SERVER}${profile.resume}`}
                 className="w-full h-full border-0"
                 title="Resume PDF"
               />
@@ -686,9 +689,9 @@ const RecruiterView = () => {
                   }}
                   onMouseDown={(e) => e.stopPropagation()}
                 >
-                  <source src={`http://localhost:5001${video.videoUrl}`} type="video/mp4" />
-                  <source src={`http://localhost:5001${video.videoUrl}`} type="video/webm" />
-                  <source src={`http://localhost:5001${video.videoUrl}`} type="video/mov" />
+                  <source src={`${API_SERVER}${video.videoUrl}`} type="video/mp4" />
+                  <source src={`${API_SERVER}${video.videoUrl}`} type="video/webm" />
+                  <source src={`${API_SERVER}${video.videoUrl}`} type="video/mov" />
                   Your browser does not support the video tag.
                 </video>
               )}

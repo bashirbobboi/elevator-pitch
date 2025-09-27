@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Check, Loader2, Upload, Video } from "lucide-react";
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -143,7 +145,7 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
       const uploadFormData = new FormData();
       uploadFormData.append('resume', file);
 
-      const response = await fetch('http://localhost:5001/api/profile/upload-resume', {
+      const response = await fetch(`${API_BASE}/profile/upload-resume`, {
         method: 'POST',
         body: uploadFormData,
       });
@@ -170,7 +172,7 @@ const ElevatorPitchForm = ({ onClose, profile, onUpdateProfile, onPitchCreated }
       uploadFormData.append('video', file);
       uploadFormData.append('title', formData.title || 'Elevator Pitch Video');
 
-      const response = await fetch('http://localhost:5001/api/videos/upload', {
+      const response = await fetch(`${API_BASE}/videos/upload`, {
         method: 'POST',
         body: uploadFormData,
       });
