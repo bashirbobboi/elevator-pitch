@@ -21,6 +21,12 @@ build/
 */.env
 */.env.local
 
+# Vercel CLI generated files
+.env.vercel
+.env.vercel.*
+*/.env.vercel
+*/.env.vercel.*
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
