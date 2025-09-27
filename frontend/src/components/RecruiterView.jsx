@@ -10,6 +10,15 @@ import FooterSection from './ui/footer';
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 const API_SERVER = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5001';
 
+// Helper function to get the correct image URL (handles both local and Cloudinary URLs)
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  // If it's already a full URL (Cloudinary), use it as-is
+  if (imagePath.startsWith('http')) return imagePath;
+  // If it's a local path, prepend API_SERVER
+  return `${API_SERVER}${imagePath}`;
+};
+
 const RecruiterView = () => {
   const { shareId } = useParams();
   const [video, setVideo] = useState(null);
@@ -278,7 +287,7 @@ const RecruiterView = () => {
                 >
                   {profile?.profilePicture ? (
                     <img 
-                      src={`${API_SERVER}${profile.profilePicture}`}
+                      src={getImageUrl(profile.profilePicture)}
                       alt={`${profile.firstName} ${profile.lastName}`}
                       className="w-full h-full object-cover"
                     />
@@ -398,7 +407,7 @@ const RecruiterView = () => {
                 >
                   {profile?.profilePicture ? (
                     <img 
-                      src={`${API_SERVER}${profile.profilePicture}`}
+                      src={getImageUrl(profile.profilePicture)}
                       alt={`${profile.firstName} ${profile.lastName}`}
                       className="w-full h-full object-cover"
                     />

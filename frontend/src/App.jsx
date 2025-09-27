@@ -24,6 +24,15 @@ import AuthModal from './components/ui/auth-modal'
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api'
 const API_SERVER = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5001'
 
+// Helper function to get the correct image URL (handles both local and Cloudinary URLs)
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  // If it's already a full URL (Cloudinary), use it as-is
+  if (imagePath.startsWith('http')) return imagePath;
+  // If it's a local path, prepend API_SERVER
+  return `${API_SERVER}${imagePath}`;
+}
+
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -108,11 +117,8 @@ function App() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [activeDropdown])
 
-  useEffect((videoId) => {
-    fetch(`${API_BASE}/videos/${videoId}/stats`)
-      .then((response) => response.json())
-      .then((analytics) => setAnalytics(analytics))
-  }, []);
+  // Remove this useEffect as it's calling stats with undefined videoId
+  // Individual video analytics are fetched when needed via fetchVideoAnalytics
 
   const mostViewedVideo = videos.reduce((max, video) => 
     video.viewCount > max.viewCount ? video : max, 
@@ -646,7 +652,7 @@ function App() {
             }}>
               {profile?.profilePicture ? (
                 <img 
-                  src={`${API_SERVER}${profile.profilePicture}`} 
+                  src={getImageUrl(profile.profilePicture)} 
                   alt="Profile" 
                   style={{ 
                     width: '100%', 
@@ -1089,7 +1095,7 @@ function App() {
                     }}>
                       {profile?.profilePicture ? (
                         <img 
-                          src={`${API_SERVER}${profile.profilePicture}`}
+                          src={getImageUrl(profile.profilePicture)}
                           alt="Profile"
                           style={{
                             width: '100%',
