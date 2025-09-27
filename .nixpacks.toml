@@ -6,15 +6,21 @@ nixPkgs = ['nodejs-20_x']
 
 [phases.install]
 cmds = [
+  'echo "=== Starting installation ==="',
   'pwd',
   'ls -la',
+  'echo "=== Checking backend directory ==="',
   'cd backend',
   'pwd',
   'ls -la',
+  'echo "=== Reading package.json ==="',
   'cat package.json',
-  'npm install --production --no-optional',
+  'echo "=== Installing dependencies ==="',
+  'npm install --production --no-optional --force',
+  'echo "=== Verifying installation ==="',
   'ls -la node_modules',
-  'echo "Dependencies installed successfully"'
+  'ls -la node_modules/express',
+  'echo "=== Dependencies installed successfully ==="'
 ]
 
 [phases.build]
