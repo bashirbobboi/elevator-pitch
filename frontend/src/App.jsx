@@ -22,6 +22,7 @@ import FooterSection from './components/ui/footer'
 import AuthModal from './components/ui/auth-modal'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api'
+const API_SERVER = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5001'
 
 function App() {
   const location = useLocation();
@@ -56,7 +57,7 @@ function App() {
   };
 
   const fetchVideos = () => {
-    fetch('http://localhost:5001/api/videos')
+    fetch(`${API_BASE}/videos`)
       .then((response) => response.json())
       .then((videos) => setVideos(videos))
       .catch((error) => console.error('Error fetching videos:', error))
@@ -108,7 +109,7 @@ function App() {
   }, [activeDropdown])
 
   useEffect((videoId) => {
-    fetch(`http://localhost:5001/api/videos/${videoId}/stats`)
+    fetch(`${API_BASE}/videos/${videoId}/stats`)
       .then((response) => response.json())
       .then((analytics) => setAnalytics(analytics))
   }, []);
@@ -254,7 +255,7 @@ function App() {
   const downloadResumeWithButton = async (shareId) => {
     try {
       const link = document.createElement('a');
-      link.href = `http://localhost:5001/api/videos/share/${shareId}/resume`;
+      link.href = `${API_BASE}/videos/share/${shareId}/resume`;
       link.download = `${profile?.firstName}_${profile?.lastName}_Resume.pdf`;
       document.body.appendChild(link);
       link.click();
@@ -281,7 +282,7 @@ function App() {
 
   const deleteVideo = async (videoId) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/videos/${videoId}`, {
+      const response = await fetch(`${API_BASE}/videos/${videoId}`, {
         method: 'DELETE',
       });
 
@@ -313,7 +314,7 @@ function App() {
 
   const fetchVideoAnalytics = async (videoId) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/videos/${videoId}/stats`);
+      const response = await fetch(`${API_BASE}/videos/${videoId}/stats`);
       if (response.ok) {
         const analyticsData = await response.json();
         setSelectedVideoAnalytics(analyticsData);
@@ -453,7 +454,7 @@ function App() {
               }}>
                 {profile?.profilePicture ? (
                   <img 
-                    src={`http://localhost:5001${profile.profilePicture}`} 
+                    src={`${API_SERVER}${profile.profilePicture}`} 
                     alt="Profile" 
                     style={{ 
                       width: '100%', 
@@ -645,7 +646,7 @@ function App() {
             }}>
               {profile?.profilePicture ? (
                 <img 
-                  src={`http://localhost:5001${profile.profilePicture}`} 
+                  src={`${API_SERVER}${profile.profilePicture}`} 
                   alt="Profile" 
                   style={{ 
                     width: '100%', 
@@ -757,7 +758,7 @@ function App() {
                       backgroundColor: '#000'
                     }}
                   >
-                    <source src={`http://localhost:5001${viewingVideo.videoUrl}`} type="video/mp4" />
+                    <source src={`${API_SERVER}${viewingVideo.videoUrl}`} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
                 )}
@@ -1088,7 +1089,7 @@ function App() {
                     }}>
                       {profile?.profilePicture ? (
                         <img 
-                          src={`http://localhost:5001${profile.profilePicture}`}
+                          src={`${API_SERVER}${profile.profilePicture}`}
                           alt="Profile"
                           style={{
                             width: '100%',

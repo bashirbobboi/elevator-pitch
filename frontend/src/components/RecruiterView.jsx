@@ -616,9 +616,9 @@ const RecruiterView = () => {
                         }, 1000);
                       }}
                     >
-                      <source src={`http://localhost:5001${video.videoUrl}`} type="video/mp4" />
-                      <source src={`http://localhost:5001${video.videoUrl}`} type="video/webm" />
-                      <source src={`http://localhost:5001${video.videoUrl}`} type="video/mov" />
+                      <source src={`${API_SERVER}${video.videoUrl}`} type="video/mp4" />
+                      <source src={`${API_SERVER}${video.videoUrl}`} type="video/webm" />
+                      <source src={`${API_SERVER}${video.videoUrl}`} type="video/mov" />
                       Your browser does not support the video tag.
                     </video>
                   )}
