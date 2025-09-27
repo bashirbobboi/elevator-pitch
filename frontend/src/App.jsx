@@ -1580,3 +1580,4 @@ function App() {
 }
 
 export default App
+// Force deployment test - updated vercel config

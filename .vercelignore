@@ -1,0 +1,12 @@
+# Don't ignore frontend directory
+!frontend/
+
+# Ignore backend and other directories
+backend/
+node_modules/
+.git/
+
+# Keep these files
+!vercel.json
+!package.json
+!README.md
