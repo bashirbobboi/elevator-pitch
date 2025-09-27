@@ -9,38 +9,11 @@ import {
   uploadProfilePicture,
   uploadResume
 } from '../controllers/profileController.js';
-import { resumeUpload } from '../config/multer.js';
+import { resumeUpload, profileUpload } from '../config/multer.js';
 
 const router = express.Router();
 
-// Configure multer for profile picture uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/profiles/');
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const cleanName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
-    cb(null, `profile-${uniqueSuffix}-${cleanName}`);
-  }
-});
-
-const fileFilter = (req, file, cb) => {
-  // Accept only image files
-  if (file.mimetype.startsWith('image/')) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only image files are allowed!'), false);
-  }
-};
-
-const upload = multer({ 
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 30 * 1024 * 1024 // 30MB limit
-  }
-});
+// Using profileUpload from multer config (handles both local and Cloudinary)
 
 // Profile routes
 router.post('/', createProfile);
@@ -69,16 +42,28 @@ router.get('/debug/all', async (req, res) => {
   }
 });
 
+// Cleanup route to remove test profiles
+router.delete('/debug/cleanup', async (req, res) => {
+  try {
+    // Delete test profiles (keep only the main one with resume)
+    const result = await Profile.deleteMany({
+      $or: [
+        { email: { $regex: /test|example|newdeploy/i } },
+        { email: 'bashirbobboi@gmail.comewf' } // Remove typo version
+      ]
+    });
+    
+    res.json({
+      message: `Cleaned up ${result.deletedCount} test profiles`,
+      deletedCount: result.deletedCount
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Profile picture upload route
-router.post('/upload-picture', (req, res, next) => {
-  upload.single('profilePicture')(req, res, (err) => {
-    if (err) {
-      console.error('Multer error:', err);
-      return res.status(400).json({ error: err.message });
-    }
-    next();
-  });
-}, uploadProfilePicture);
+router.post('/upload-picture', profileUpload.single('profilePicture'), uploadProfilePicture);
 
 // Resume upload route
 router.post('/upload-resume', (req, res, next) => {
