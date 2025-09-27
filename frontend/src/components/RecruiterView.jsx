@@ -5,6 +5,7 @@ import portfolioLogo from '../assets/portfolio.png';
 import downloadGif from '../assets/download2.gif';
 import playGif from '../assets/play.png';
 import workLogo from '../assets/work.png';
+import FooterSection from './ui/footer';
 
 const RecruiterView = () => {
   const { shareId } = useParams();
@@ -712,6 +713,9 @@ const RecruiterView = () => {
           </div>
         </>
       )}
+
+      {/* Footer */}
+      <FooterSection />
     </div>
   );
 };

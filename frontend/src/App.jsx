@@ -18,6 +18,7 @@ import ElevatorPitchForm from './components/ui/elevator-pitch-form'
 
 import { ProfileForm } from './components/ui/profile-form'
 import Toaster from './components/ui/toast'
+import FooterSection from './components/ui/footer'
 
 const API_BASE = 'http://localhost:5001/api'
 
@@ -1196,6 +1197,9 @@ function App() {
               ))}
             </div>
           </div>
+
+          {/* Footer */}
+          <FooterSection />
         </>
       )}
       
