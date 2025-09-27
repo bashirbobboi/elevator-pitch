@@ -898,7 +898,7 @@ function App() {
                     }}>
                       <span>📞 {profile?.phone || '+1 (555) 123-4567'}</span>
                       <span>|</span>
-                      <span>✉️ {profile?.email || 'email@example.com'}</span>
+                      <span> {profile?.email || 'email@example.com'}</span>
                       <span>|</span>
                       <span>🌐 {profile?.portfolioUrl || 'portfolio.com'}</span>
                       <span>|</span>
