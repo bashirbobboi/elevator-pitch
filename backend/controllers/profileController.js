@@ -1,5 +1,6 @@
 import Profile from '../models/Profile.js';
 import { deleteFile, fileExists } from '../utils/fileUtils.js';
+import { v2 as cloudinary } from 'cloudinary';
 import path from 'path';
 
 // Create or update the single profile (since this is a single-user platform)
@@ -123,15 +124,18 @@ export const deleteProfile = async (req, res) => {
 // Upload profile picture
 export const uploadProfilePicture = async (req, res) => {
   try {
+    const useCloudinary = process.env.NODE_ENV === 'production' || process.env.USE_CLOUDINARY === 'true';
+    
     console.log('Upload request received:', {
       hasFile: !!req.file,
-      useCloudinary: process.env.NODE_ENV === 'production' || process.env.USE_CLOUDINARY === 'true',
+      useCloudinary,
       fileInfo: req.file ? {
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
         size: req.file.size,
         filename: req.file.filename,
-        path: req.file.path
+        path: req.file.path,
+        public_id: req.file.public_id
       } : null
     });
 
@@ -149,23 +153,56 @@ export const uploadProfilePicture = async (req, res) => {
 
     console.log('Found profile:', profile._id);
 
-    // Delete old profile picture if it exists and is a local file
-    if (profile.profilePicture && !profile.profilePicture.startsWith('http')) {
-      const oldImagePath = path.join(process.cwd(), profile.profilePicture);
-      if (await fileExists(oldImagePath)) {
-        await deleteFile(oldImagePath);
-        console.log('Deleted old profile picture');
+    // Delete old profile picture if it exists
+    if (profile.profilePicture) {
+      if (profile.profilePicture.startsWith('http')) {
+        // Cloudinary image - delete using public_id
+        if (profile.cloudinaryId) {
+          try {
+            await cloudinary.uploader.destroy(profile.cloudinaryId);
+            console.log('Deleted old profile picture from Cloudinary:', profile.cloudinaryId);
+          } catch (error) {
+            console.error('Error deleting from Cloudinary:', error);
+            // Continue with upload even if deletion fails
+          }
+        }
+      } else {
+        // Local file - delete from filesystem
+        const oldImagePath = path.join(process.cwd(), profile.profilePicture);
+        console.log('Attempting to delete old local picture:', {
+          storedPath: profile.profilePicture,
+          resolvedPath: oldImagePath,
+          exists: await fileExists(oldImagePath)
+        });
+        if (await fileExists(oldImagePath)) {
+          await deleteFile(oldImagePath);
+          console.log('Deleted old local profile picture');
+        } else {
+          console.log('Old picture file not found, may have been deleted already');
+        }
       }
     }
 
-    // Update profile with new picture path (Cloudinary URL or local path)
+    // Update profile with new picture path and cloudinaryId
     const oldPicture = profile.profilePicture;
-    profile.profilePicture = req.file.path || `/uploads/profiles/${req.file.filename}`;
+    
+    if (useCloudinary) {
+      // Cloudinary upload
+      profile.profilePicture = req.file.path; // Cloudinary URL
+      profile.cloudinaryId = req.file.filename; // Save Cloudinary public_id for deletion
+    } else {
+      // Local upload
+      profile.profilePicture = `/uploads/profiles/${req.file.filename}`;
+      profile.cloudinaryId = null; // Clear cloudinaryId for local files
+    }
+    
     await profile.save();
 
     console.log('Profile picture updated:', {
       oldPicture: oldPicture,
       newPicture: profile.profilePicture,
+      cloudinaryId: profile.cloudinaryId,
+      useCloudinary,
       profileId: profile._id,
       updatedAt: profile.updatedAt
     });
