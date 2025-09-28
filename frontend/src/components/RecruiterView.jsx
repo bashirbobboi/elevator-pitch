@@ -19,6 +19,24 @@ const getImageUrl = (imagePath) => {
   return `${API_SERVER}${imagePath}`;
 };
 
+// Helper function to get the correct video URL (handles both local and Cloudinary URLs)
+const getVideoUrl = (videoPath) => {
+  if (!videoPath) return null;
+  // If it's already a full URL (Cloudinary), use it as-is
+  if (videoPath.startsWith('http')) return videoPath;
+  // If it's a local path, prepend API_SERVER
+  return `${API_SERVER}${videoPath}`;
+};
+
+// Helper function to get the correct resume URL (handles both local and Cloudinary URLs)
+const getResumeUrl = (resumePath) => {
+  if (!resumePath) return null;
+  // If it's already a full URL (Cloudinary), use it as-is
+  if (resumePath.startsWith('http')) return resumePath;
+  // If it's a local path, prepend API_SERVER
+  return `${API_SERVER}${resumePath}`;
+};
+
 const RecruiterView = () => {
   const { shareId } = useParams();
   const [video, setVideo] = useState(null);
@@ -186,7 +204,7 @@ const RecruiterView = () => {
       
       // Download original resume (without button) for recruiter view
       const link = document.createElement('a');
-      link.href = `${API_SERVER}${profile.resume}`;
+      link.href = getResumeUrl(profile.resume);
       link.download = `${profile.firstName}_${profile.lastName}_Resume.pdf`;
       document.body.appendChild(link);
       link.click();
@@ -558,7 +576,7 @@ const RecruiterView = () => {
           {profile?.resume ? (
             <div className="w-full h-[80vh] sm:h-[100vh] lg:h-[130vh] border border-gray-300 rounded-lg overflow-hidden shadow-lg">
               <iframe
-                src={`${API_SERVER}${profile.resume}`}
+                src={getResumeUrl(profile.resume)}
                 className="w-full h-full border-0"
                 title="Resume PDF"
               />
@@ -625,9 +643,9 @@ const RecruiterView = () => {
                         }, 1000);
                       }}
                     >
-                      <source src={`${API_SERVER}${video.videoUrl}`} type="video/mp4" />
-                      <source src={`${API_SERVER}${video.videoUrl}`} type="video/webm" />
-                      <source src={`${API_SERVER}${video.videoUrl}`} type="video/mov" />
+                      <source src={getVideoUrl(video.videoUrl)} type="video/mp4" />
+                      <source src={getVideoUrl(video.videoUrl)} type="video/webm" />
+                      <source src={getVideoUrl(video.videoUrl)} type="video/mov" />
                       Your browser does not support the video tag.
                     </video>
                   )}
@@ -698,9 +716,9 @@ const RecruiterView = () => {
                   }}
                   onMouseDown={(e) => e.stopPropagation()}
                 >
-                  <source src={`${API_SERVER}${video.videoUrl}`} type="video/mp4" />
-                  <source src={`${API_SERVER}${video.videoUrl}`} type="video/webm" />
-                  <source src={`${API_SERVER}${video.videoUrl}`} type="video/mov" />
+                  <source src={getVideoUrl(video.videoUrl)} type="video/mp4" />
+                  <source src={getVideoUrl(video.videoUrl)} type="video/webm" />
+                  <source src={getVideoUrl(video.videoUrl)} type="video/mov" />
                   Your browser does not support the video tag.
                 </video>
               )}
