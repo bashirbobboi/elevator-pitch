@@ -221,8 +221,14 @@ function App() {
     }
   }
 
-  const uploadProfilePicture = async (file) => {
+  const uploadProfilePicture = async (files) => {
     try {
+      const file = files[0]; // Get the first file from the array
+      if (!file) {
+        console.error('No file provided');
+        return { success: false, error: 'No file provided' };
+      }
+      
       console.log('Uploading file:', {
         name: file.name,
         type: file.type,
@@ -1260,7 +1266,7 @@ function App() {
                       alignItems: 'center'
                     }}>
                       <FileInput
-                        onChange={uploadProfilePicture}
+                        onFileChange={uploadProfilePicture}
                         accept="image/*,.jpg,.jpeg,.png,.gif,.webp,.bmp,.tiff"
                         maxFileSize={30 * 1024 * 1024} // 30MB
                         placeholder="Click to upload or drag and drop"
