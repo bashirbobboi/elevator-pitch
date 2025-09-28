@@ -20,10 +20,31 @@ echo "✅ All dependencies installed!"
 echo ""
 echo "🌐 Starting both frontend and backend..."
 echo "   Frontend: http://localhost:5173"
-echo "   Backend: http://localhost:3000"
+echo "   Backend: http://localhost:5001"
 echo ""
 echo "Press Ctrl+C to stop both servers"
 echo ""
 
-# Start both servers
-npm run dev
+# Start both servers in background
+echo "Starting backend server..."
+(cd backend && npm run dev) &
+BACKEND_PID=$!
+
+echo "Starting frontend server..."
+(cd frontend && npm run dev) &
+FRONTEND_PID=$!
+
+# Function to cleanup processes on exit
+cleanup() {
+    echo ""
+    echo "🛑 Stopping servers..."
+    kill $BACKEND_PID 2>/dev/null
+    kill $FRONTEND_PID 2>/dev/null
+    exit 0
+}
+
+# Set trap to cleanup on script exit
+trap cleanup SIGINT SIGTERM
+
+# Wait for both processes
+wait $BACKEND_PID $FRONTEND_PID

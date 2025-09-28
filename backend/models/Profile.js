@@ -46,6 +46,10 @@ const profileSchema = new mongoose.Schema({
     type: String, // Path to the uploaded image file
     default: null
   },
+  cloudinaryId: {
+    type: String, // Cloudinary public_id for deletion
+    default: null
+  },
   resume: {
     type: String, // Path to the uploaded resume file
     default: null
