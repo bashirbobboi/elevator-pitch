@@ -37,6 +37,17 @@ const getResumeUrl = (resumePath) => {
   return `${API_SERVER}${resumePath}`;
 };
 
+// Helper function to get the correct resume URL for iframe display (adds .pdf extension for Cloudinary)
+const getResumeDisplayUrl = (resumePath) => {
+  if (!resumePath) return null;
+  // If it's a Cloudinary URL, add .pdf extension for proper iframe display
+  if (resumePath.startsWith('http')) {
+    return resumePath.endsWith('.pdf') ? resumePath : `${resumePath}.pdf`;
+  }
+  // If it's a local path, prepend API_SERVER
+  return `${API_SERVER}${resumePath}`;
+};
+
 const RecruiterView = () => {
   const { shareId } = useParams();
   const [video, setVideo] = useState(null);
@@ -576,7 +587,7 @@ const RecruiterView = () => {
           {profile?.resume ? (
             <div className="w-full h-[80vh] sm:h-[100vh] lg:h-[130vh] border border-gray-300 rounded-lg overflow-hidden shadow-lg">
               <iframe
-                src={getResumeUrl(profile.resume)}
+                src={getResumeDisplayUrl(profile.resume)}
                 className="w-full h-full border-0"
                 title="Resume PDF"
               />
