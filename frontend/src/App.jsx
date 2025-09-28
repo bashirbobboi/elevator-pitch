@@ -127,6 +127,9 @@ function App() {
       else setActivePage('dashboard');
     };
 
+    // Call handler on initial load to set correct page
+    handleHashChange();
+
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
@@ -1344,7 +1347,7 @@ function App() {
                 <button 
                   className='action-btn copy-btn'
                   onClick={() => {
-                    navigator.clipboard.writeText(`${import.meta.env.VITE_FRONTEND_URL || 'https://elevator-pitch-rho.vercel.app'}/api/videos/share/${video.shareId}`)
+                    navigator.clipboard.writeText(`${import.meta.env.VITE_FRONTEND_URL || 'https://elevator-pitch-rho.vercel.app'}/recruiter/${video.shareId}`)
                     toasterRef.current?.show({
                       title: 'Copied!',
                       message: 'Pitch link copied to clipboard',
@@ -1366,7 +1369,7 @@ function App() {
                       className='action-btn view-btn'
                       onClick={() => {
                         if (video.shareId) {
-                          navigate(`/api/videos/share/${video.shareId}`)
+                          navigate(`/recruiter/${video.shareId}`)
                         } else {
                           toasterRef.current?.show({
                             title: 'Error',
