@@ -60,7 +60,15 @@ function App() {
   const [videos, setVideos] = useState([])
   const [analytics, setAnalytics] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [activePage, setActivePage] = useState('dashboard') // Track active page
+  const [activePage, setActivePage] = useState(() => {
+    // Initialize from URL hash if available
+    const hash = window.location.hash;
+    if (hash === '#profile') return 'profile';
+    if (hash === '#videos') return 'videos';
+    if (hash === '#analytics') return 'analytics';
+    if (hash === '#settings') return 'settings';
+    return 'dashboard';
+  }) // Track active page
   const [profile, setProfile] = useState(null)
   const [profileLoading, setProfileLoading] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -74,7 +82,7 @@ function App() {
   const toasterRef = useRef(null)
 
   // Check if we're on a recruiter route
-  const isRecruiterRoute = location.pathname.startsWith('/api/videos/share/')
+  const isRecruiterRoute = location.pathname.startsWith('/recruiter/')
 
   // Show auth modal if not authenticated and trying to access dashboard
   const showAuthIfNeeded = () => {
@@ -106,6 +114,21 @@ function App() {
     
     // Load admin profile on app start
     fetchProfile()
+  }, []);
+
+  // Listen for hash changes to update active page
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === '#profile') setActivePage('profile');
+      else if (hash === '#videos') setActivePage('videos');
+      else if (hash === '#analytics') setActivePage('analytics');
+      else if (hash === '#settings') setActivePage('settings');
+      else setActivePage('dashboard');
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   const handleLogin = () => {
@@ -422,7 +445,7 @@ function App() {
   return (
     <Routes>
       {/* Recruiter Route - No sidebar, clean layout */}
-      <Route path="/api/videos/share/:shareId" element={<RecruiterView />} />
+      <Route path="/recruiter/:shareId" element={<RecruiterView />} />
       
       {/* 404 Error Page - No sidebar, clean layout */}
       <Route path="/404" element={<NotFound />} />
