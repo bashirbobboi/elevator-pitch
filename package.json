@@ -7,8 +7,9 @@
     "dev": "./start-dev.sh",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
-    "build": "echo 'Backend deployment - skipping frontend build'",
+    "build": "cd backend && npm install --production",
     "install:all": "cd frontend && npm install && cd ../backend && npm install",
-    "start": "cd backend && npm start"
+    "start": "cd backend && npm start",
+    "postinstall": "cd backend && npm install --production"
   }
 }
