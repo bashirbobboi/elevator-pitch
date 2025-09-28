@@ -37,12 +37,12 @@ const getResumeUrl = (resumePath) => {
   return `${API_SERVER}${resumePath}`;
 };
 
-// Helper function to get the correct resume URL for iframe display (adds .pdf extension for Cloudinary)
+// Helper function to get the correct resume URL for iframe display (uses Google PDF viewer for Cloudinary URLs)
 const getResumeDisplayUrl = (resumePath) => {
   if (!resumePath) return null;
-  // If it's a Cloudinary URL, add .pdf extension for proper iframe display
+  // If it's a Cloudinary URL, use Google PDF viewer for proper iframe display
   if (resumePath.startsWith('http')) {
-    return resumePath.endsWith('.pdf') ? resumePath : `${resumePath}.pdf`;
+    return `https://docs.google.com/gview?url=${encodeURIComponent(resumePath)}&embedded=true`;
   }
   // If it's a local path, prepend API_SERVER
   return `${API_SERVER}${resumePath}`;
