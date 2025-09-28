@@ -151,11 +151,18 @@ function App() {
   const fetchProfile = async () => {
     try {
       setProfileLoading(true)
+      console.log('Fetching profile from:', `${API_BASE}/profile`)
       const response = await fetch(`${API_BASE}/profile`)
       if (response.ok) {
         const profileData = await response.json()
+        console.log('Profile fetched successfully:', {
+          id: profileData._id,
+          profilePicture: profileData.profilePicture,
+          updatedAt: profileData.updatedAt
+        })
         setProfile(profileData)
       } else {
+        console.log('Failed to fetch profile:', response.status, response.statusText)
         setProfile(null)
       }
     } catch (error) {
@@ -243,10 +250,9 @@ function App() {
         console.log('Upload successful:', result);
         // Refresh the entire profile to get the updated picture URL
         await fetchProfile()
-        // Force re-render by adding a timestamp to trigger React update
+        // Add timestamp to force re-render after fetchProfile completes
         setProfile(prevProfile => ({
           ...prevProfile,
-          profilePicture: result.profilePicture,
           _imageTimestamp: Date.now() // Add timestamp to force re-render
         }))
         toasterRef.current?.show({
