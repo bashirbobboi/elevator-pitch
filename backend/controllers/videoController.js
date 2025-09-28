@@ -102,29 +102,36 @@ export const downloadResumeWithButton = async (req, res) => {
       return res.status(404).json({ error: "Resume not found" });
     }
 
-    // Construct downloadable resume path
-    const originalFileName = profile.resume.split('/').pop();
-    const fileNameWithoutExt = originalFileName.replace('.pdf', '');
-    const downloadablePath = `uploads/resumes/${fileNameWithoutExt}_downloadable.pdf`;
+    // Handle Cloudinary URLs vs local files
+    if (profile.resume.startsWith('http')) {
+      // For Cloudinary URLs, redirect to the original resume
+      console.log('Resume is stored in Cloudinary, redirecting to original file');
+      return res.redirect(profile.resume);
+    } else {
+      // For local files, create downloadable version
+      const originalFileName = profile.resume.split('/').pop();
+      const fileNameWithoutExt = originalFileName.replace('.pdf', '');
+      const downloadablePath = `uploads/resumes/${fileNameWithoutExt}_downloadable.pdf`;
 
-    // Check if downloadable version exists, create it if it doesn't
-    if (!await fileExists(downloadablePath)) {
-      try {
-        console.log(`Creating downloadable resume for shareId: ${shareId}`);
-        await createDownloadableResume(profile.resume, shareId);
-        console.log(`✅ Created downloadable resume: ${downloadablePath}`);
-      } catch (createError) {
-        console.error('Error creating downloadable resume:', createError);
-        return res.status(500).json({ error: "Failed to create downloadable resume" });
+      // Check if downloadable version exists, create it if it doesn't
+      if (!await fileExists(downloadablePath)) {
+        try {
+          console.log(`Creating downloadable resume for shareId: ${shareId}`);
+          await createDownloadableResume(profile.resume, shareId);
+          console.log(`✅ Created downloadable resume: ${downloadablePath}`);
+        } catch (createError) {
+          console.error('Error creating downloadable resume:', createError);
+          return res.status(500).json({ error: "Failed to create downloadable resume" });
+        }
       }
-    }
 
-    // Set headers for download
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${profile.firstName}_${profile.lastName}_Resume.pdf"`);
-    
-    // Send file
-    res.sendFile(downloadablePath, { root: process.cwd() });
+      // Set headers for download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${profile.firstName}_${profile.lastName}_Resume.pdf"`);
+      
+      // Send file
+      res.sendFile(downloadablePath, { root: process.cwd() });
+    }
   } catch (error) {
     console.error('Error downloading resume:', error);
     res.status(500).json({ error: error.message });
