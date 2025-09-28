@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Analytics } from '@vercel/analytics/react';
 import linkedInLogo from '../assets/linkedIN.png';
 import portfolioLogo from '../assets/portfolio.png';
 import downloadGif from '../assets/download2.gif';
@@ -771,9 +770,6 @@ const RecruiterView = () => {
 
       {/* Footer */}
       <FooterSection />
-      
-      {/* Vercel Analytics - Track recruiter views */}
-      <Analytics />
     </div>
   );
 };
