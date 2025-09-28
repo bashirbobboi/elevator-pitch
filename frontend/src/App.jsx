@@ -991,7 +991,7 @@ function App() {
                             margin: '0 0 0.5rem 0',
                             color: '#374151'
                           }}>
-                            Bachelor of Science in Computer Science
+                            Bachelor of Science in
                           </p>
                           <p style={{ 
                             fontSize: '0.9rem', 
