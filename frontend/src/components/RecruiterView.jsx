@@ -626,7 +626,6 @@ const RecruiterView = () => {
                     <video
                       controls
                       autoPlay
-                      muted
                       className="w-full h-auto max-h-full bg-black rounded-lg"
                       onLoadStart={() => setVideoError(false)}
                       onCanPlay={() => setVideoError(false)}
@@ -693,7 +692,6 @@ const RecruiterView = () => {
                 <video
                   controls
                   autoPlay
-                  muted
                   className="bg-black rounded-lg shadow-2xl"
                   style={{ 
                     width: window.innerWidth < 1024 ? '200px' : '240px', 
