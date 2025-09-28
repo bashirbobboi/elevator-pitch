@@ -108,35 +108,61 @@ export const downloadResumeWithButton = async (req, res) => {
       console.log('Resume is stored in Cloudinary, downloading and adding button');
       
       try {
-        // Download the file from Cloudinary
-        const response = await fetch(profile.resume);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch resume from Cloudinary: ${response.statusText}`);
+        console.log('Starting Cloudinary resume processing...');
+        console.log('Resume URL:', profile.resume);
+        
+        // Ensure uploads/resumes directory exists
+        const fs = await import('fs');
+        const path = await import('path');
+        const resumesDir = 'uploads/resumes';
+        if (!fs.existsSync(resumesDir)) {
+          fs.mkdirSync(resumesDir, { recursive: true });
+          console.log('Created uploads/resumes directory');
         }
         
+        // Download the file from Cloudinary
+        console.log('Downloading resume from Cloudinary...');
+        const response = await fetch(profile.resume);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch resume from Cloudinary: ${response.status} ${response.statusText}`);
+        }
+        
+        console.log('Resume downloaded successfully, processing...');
         const resumeBuffer = await response.arrayBuffer();
-        const resumePath = `uploads/resumes/temp_${shareId}_${Date.now()}.pdf`;
+        const resumePath = path.join(resumesDir, `temp_${shareId}_${Date.now()}.pdf`);
         
         // Write the downloaded file to temp location
-        const fs = await import('fs');
         fs.writeFileSync(resumePath, Buffer.from(resumeBuffer));
+        console.log('Temp file written:', resumePath);
         
         // Create downloadable version with button
+        console.log('Creating downloadable version with button...');
         const downloadablePath = await createDownloadableResume(resumePath, shareId);
+        console.log('Downloadable version created:', downloadablePath);
         
         // Clean up temp file
         fs.unlinkSync(resumePath);
+        console.log('Temp file cleaned up');
         
         // Set headers for download
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${profile.firstName}_${profile.lastName}_Resume.pdf"`);
         
         // Send the modified file
+        console.log('Sending modified file to client...');
         res.sendFile(downloadablePath, { root: process.cwd() });
         
       } catch (cloudinaryError) {
-        console.error('Error processing Cloudinary resume:', cloudinaryError);
-        return res.status(500).json({ error: "Failed to process Cloudinary resume" });
+        console.error('Detailed error processing Cloudinary resume:', {
+          message: cloudinaryError.message,
+          stack: cloudinaryError.stack,
+          resumeUrl: profile.resume,
+          shareId: shareId
+        });
+        return res.status(500).json({ 
+          error: "Failed to process Cloudinary resume",
+          details: cloudinaryError.message 
+        });
       }
     } else {
       // For local files, create downloadable version
