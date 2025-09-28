@@ -11,6 +11,6 @@
     "build:backend": "cd backend && npm install --production",
     "install:all": "cd frontend && npm install && cd ../backend && npm install",
     "start": "cd backend && npm start",
-    "postinstall": "cd frontend && npm install"
+    "postinstall": "cd backend && npm install --production"
   }
 }
