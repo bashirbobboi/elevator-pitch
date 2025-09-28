@@ -139,15 +139,29 @@ export const uploadProfilePicture = async (req, res) => {
     // Delete old profile picture if it exists and is a local file
     if (profile.profilePicture && !profile.profilePicture.startsWith('http')) {
       const oldImagePath = path.join(process.cwd(), profile.profilePicture);
+      console.log('Attempting to delete old picture:', {
+        storedPath: profile.profilePicture,
+        resolvedPath: oldImagePath,
+        exists: await fileExists(oldImagePath)
+      });
       if (await fileExists(oldImagePath)) {
         await deleteFile(oldImagePath);
         console.log('Deleted old profile picture');
+      } else {
+        console.log('Old picture file not found, may have been deleted already');
       }
     }
 
     // Update profile with new picture path (Cloudinary URL or local path)
     const oldPicture = profile.profilePicture;
-    profile.profilePicture = req.file.path || `/uploads/profiles/${req.file.filename}`;
+    
+    // Always store relative path for local files, full URL for Cloudinary
+    if (process.env.NODE_ENV === 'production' || process.env.USE_CLOUDINARY === 'true') {
+      profile.profilePicture = req.file.path; // Cloudinary gives you a full URL
+    } else {
+      profile.profilePicture = `/uploads/profiles/${req.file.filename}`; // Always relative path
+    }
+    
     await profile.save();
 
     console.log('Profile picture updated:', {
