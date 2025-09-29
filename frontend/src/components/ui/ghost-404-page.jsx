@@ -167,7 +167,7 @@ export function NotFound() {
             className="text-lg md:text-xl text-[#222222] mb-8 md:mb-12 opacity-50 select-none"
             variants={itemVariants}
           >
-            Try refreshing the page just in case.
+            Wait 60 Seconds and try refreshing the page just in case because sometimes the server goes to sleep.
           </motion.p>
 
           <motion.div 
