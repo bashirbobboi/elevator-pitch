@@ -2,7 +2,6 @@
 
 > **Transform your job search with professional video elevator pitches that recruiters actually want to watch.**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Available-brightgreen)](https://your-demo-link.com)
 [![Tech Stack](https://img.shields.io/badge/Tech%20Stack-React%20%7C%20Node.js%20%7C%20MongoDB-blue)](#tech-stack)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
